@@ -1,0 +1,37 @@
+# 通用
+*.min.js
+*.md
+*.json
+*.html
+pnpm-workspace.yaml
+
+# 依赖目录
+node_modules
+
+# 构建产物
+dist
+build
+out
+# 后端目录
+backend
+
+# IDE 配置文件
+.idea
+.vscode
+
+# 锁文件
+pnpm-lock.yaml
+package-lock.json
+yarn.lock
+
+# 静态资源
+public
+assets
+
+# 配置文件（不需要格式化）
+*.cjs
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.ico

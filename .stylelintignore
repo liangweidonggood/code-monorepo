@@ -1,0 +1,27 @@
+# 依赖目录
+node_modules/
+
+# 构建产物
+dist/
+build/
+out/
+
+# 后端目录
+backend/
+
+# IDE 配置
+.idea/
+.vscode/
+
+# 锁文件
+pnpm-lock.yaml
+package-lock.json
+yarn.lock
+
+# 静态资源
+assets/
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.ico

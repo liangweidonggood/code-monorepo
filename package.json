@@ -4,7 +4,15 @@
   "description": "这是一个多语言单仓学习项目",
   "type": "module",
   "scripts": {
-    "prepare": "husky"
+    "prepare": "husky",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "eslint:check": "eslint .",
+    "eslint": "eslint . --fix",
+    "stylelint:check": "stylelint \"**/*.{css,scss,less}\"",
+    "stylelint": "stylelint \"**/*.{css,scss,less}\" --fix",
+    "lint": "eslint . && stylelint \"**/*.{css,scss,less}\" && prettier --check .",
+    "lint:fix": "eslint . --fix && stylelint \"**/*.{css,scss,less}\" --fix && prettier --write ."
   },
   "keywords": [
     "monorepo"
@@ -15,6 +23,34 @@
   "devDependencies": {
     "@commitlint/cli": "^21.0.1",
     "@commitlint/config-conventional": "^21.0.1",
-    "husky": "^9.1.7"
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.4.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.6",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "eslint-plugin-react-refresh": "^0.5.2",
+    "eslint-plugin-vue": "^10.9.1",
+    "globals": "^17.6.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^17.0.5",
+    "postcss-less": "^6.0.0",
+    "prettier": "^3.8.3",
+    "stylelint": "^17.12.0",
+    "stylelint-config-recess-order": "^7.7.0",
+    "stylelint-config-standard": "^40.0.0",
+    "stylelint-less": "^4.2.1",
+    "stylelint-scss": "^7.1.1",
+    "typescript-eslint": "^8.60.0"
+  },
+  "lint-staged": {
+    "**/*.{js,jsx,ts,tsx,vue}": [
+      "pnpm eslint:check",
+      "pnpm format:check"
+    ],
+    "**/*.{css,scss,less}": [
+      "pnpm stylelint:check",
+      "pnpm format:check"
+    ]
   }
 }
