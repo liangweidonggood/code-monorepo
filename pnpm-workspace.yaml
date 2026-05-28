@@ -1,0 +1,11 @@
+packages:
+  - frontend/**
+  - '!**/node_modules'
+  - '!**/target'
+  - '!**/dist'
+  - '!**/build'
+  - '!frontend/**/src-tauri'
+  - '!backend/**'
+
+onlyBuiltDependencies:
+  - esbuild
