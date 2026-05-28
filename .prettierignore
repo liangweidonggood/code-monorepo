@@ -1,5 +1,4 @@
 # 通用
-*.min.js
 *.md
 *.json
 *.html
@@ -9,9 +8,6 @@ pnpm-workspace.yaml
 node_modules
 
 # 构建产物
-dist
-build
-out
 # 后端目录
 backend
 
@@ -22,8 +18,6 @@ backend
 # 锁文件
 pnpm-lock.yaml
 package-lock.json
-yarn.lock
-
 # 静态资源
 public
 assets
