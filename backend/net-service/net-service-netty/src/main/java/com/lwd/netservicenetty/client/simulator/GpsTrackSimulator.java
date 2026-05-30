@@ -1,5 +1,7 @@
 package com.lwd.netservicenetty.client.simulator;
 
+import java.util.concurrent.ThreadLocalRandom;
+
 /**
  * GPS 轨迹模拟器 — 按速度和方向生成连续的模拟坐标
  *
@@ -47,8 +49,8 @@ public class GpsTrackSimulator {
     public GpsPoint nextPosition() {
         counter++;
         if (counter % TURN_INTERVAL == 0) {
-            heading += (Math.random() - 0.5) * HEADING_DELTA_RAD;
-            speed += (Math.random() - 0.5) * SPEED_DELTA_KMH;
+            heading += (ThreadLocalRandom.current().nextDouble() - 0.5) * HEADING_DELTA_RAD;
+            speed += (ThreadLocalRandom.current().nextDouble() - 0.5) * SPEED_DELTA_KMH;
             if (speed < SPEED_MIN_KMH) {
                 speed = SPEED_MIN_KMH;
             }
@@ -67,8 +69,8 @@ public class GpsTrackSimulator {
             heading = (heading + Math.PI) % (2 * Math.PI);
         }
 
-        int alt = ALT_BASE_M + (int) (Math.random() * ALT_RANGE_M);
-        int sat = SAT_MIN + (int) (Math.random() * SAT_RANGE);
+        int alt = ALT_BASE_M + (int) (ThreadLocalRandom.current().nextDouble() * ALT_RANGE_M);
+        int sat = SAT_MIN + (int) (ThreadLocalRandom.current().nextDouble() * SAT_RANGE);
         int fuel = Math.max(0, 100 - counter / FUEL_DECREASE_RATE);
 
         return new GpsPoint(lat, lng, (int) speed, alt, sat, fuel);

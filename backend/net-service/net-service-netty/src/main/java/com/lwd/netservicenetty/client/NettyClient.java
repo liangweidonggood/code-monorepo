@@ -3,11 +3,23 @@ package com.lwd.netservicenetty.client;
 import com.lwd.netservicenetty.client.simulator.GpsTrackSimulator;
 import com.lwd.netservicenetty.core.ProtocolFrameDecoder;
 import com.lwd.netservicenetty.core.ProtocolFrameEncoder;
-import com.lwd.netservicenetty.protocol.*;
+import com.lwd.netservicenetty.protocol.AlarmReport;
+import com.lwd.netservicenetty.protocol.AuthRequest;
+import com.lwd.netservicenetty.protocol.Heartbeat;
+import com.lwd.netservicenetty.protocol.LocationReport;
+import com.lwd.netservicenetty.protocol.ProtocolConstants;
+import com.lwd.netservicenetty.protocol.RegistrationRequest;
 import com.lwd.netservicenetty.transport.Transport;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
-import io.netty.channel.*;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelOption;
+import io.netty.channel.ChannelPipeline;
+import io.netty.channel.EventLoopGroup;
+import io.netty.channel.MultiThreadIoEventLoopGroup;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
@@ -19,6 +31,7 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -180,7 +193,7 @@ public class NettyClient {
                 0, LocalDateTime.now(), nextSeq());
         ctx.writeAndFlush(loc);
 
-        if (Math.random() < 0.05) {
+        if (ThreadLocalRandom.current().nextDouble() < 0.05) {
             var alarm = new AlarmReport(config.terminalId(), 1, 1,
                     point.latitude(), point.longitude(), point.speed(),
                     LocalDateTime.now(), "模拟测试告警");
