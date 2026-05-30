@@ -9,9 +9,9 @@ services:
       - SONAR_JDBC_USERNAME=sonarqube
       - SONAR_JDBC_PASSWORD=sonarqube
     volumes:
-      - sonarqube_data:/opt/sonarqube/data
-      - sonarqube_logs:/opt/sonarqube/logs
-      - sonarqube_extensions:/opt/sonarqube/extensions
+      - ./.sonarqube/data:/opt/sonarqube/data
+      - ./.sonarqube/logs:/opt/sonarqube/logs
+      - ./.sonarqube/extensions:/opt/sonarqube/extensions
     stop_timeout: 3600
     depends_on:
       - db
@@ -24,11 +24,5 @@ services:
       - POSTGRES_PASSWORD=sonarqube
       - POSTGRES_DB=sonarqube
     volumes:
-      - postgresql_data:/var/lib/postgresql/data
+      - ./.sonarqube/postgresql:/var/lib/postgresql/data
     restart: unless-stopped
-
-volumes:
-  sonarqube_data:
-  sonarqube_logs:
-  sonarqube_extensions:
-  postgresql_data:
