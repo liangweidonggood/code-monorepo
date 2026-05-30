@@ -15,8 +15,9 @@ netty:
       keep-alive-seconds: 60
       thread-name-prefix: biz-worker-
   client:
+    enabled: true
     host: localhost
-    port: 8888
+    port: 8889
     heartbeat-interval-seconds: 20
     location-interval-seconds: 5
     reconnect-base-delay-seconds: 1

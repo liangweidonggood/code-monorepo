@@ -11,7 +11,6 @@ import io.netty.channel.*;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
-import io.netty.handler.timeout.IdleStateHandler;
 import jakarta.annotation.PreDestroy;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -24,14 +23,19 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * Netty TCP 客户端 — 模拟车联网终端
- * <p>
- * 生命周期: 连接 → 注册 → 鉴权 → 工作循环(心跳+位置+告警) → 断开重连
  *
  * @author Administrator
  */
 @Slf4j
 @Component
 public class NettyClient {
+
+    private static final double GPS_START_LAT = 39.9;
+    private static final double GPS_START_LNG = 116.3;
+    private static final double GPS_START_SPEED = 60.0;
+    private static final double GPS_STEP_DEG = 0.0008;
+    private static final double ALARM_PROBABILITY = 0.05;
+    private static final byte HEARTBEAT_FLAGS = (byte) 0x01;
 
     private final TcpClientConfig config;
     private final ProtocolFrameEncoder encoder;
@@ -53,12 +57,16 @@ public class NettyClient {
         this.config = config;
         this.encoder = encoder;
         this.decoder = decoder;
-        this.simulator = new GpsTrackSimulator(39.9, 116.3, 60.0, 0.0008);
+        this.simulator = new GpsTrackSimulator(GPS_START_LAT, GPS_START_LNG, GPS_START_SPEED, GPS_STEP_DEG);
         this.originalLocationInterval = config.locationIntervalSeconds();
     }
 
     @EventListener(ApplicationReadyEvent.class)
     public void start() {
+        if (!config.enabled()) {
+            log.info("客户端已禁用");
+            return;
+        }
         log.info("客户端启动，目标: {}:{}", config.host(), config.port());
         connect();
     }
@@ -76,8 +84,6 @@ public class NettyClient {
         log.info("客户端已关闭");
     }
 
-    // ── 连接管理 ──
-
     private void connect() {
         Transport transport = Transport.resolve();
         group = new MultiThreadIoEventLoopGroup(1, transport.factory());
@@ -94,8 +100,11 @@ public class NettyClient {
                         ChannelPipeline p = ch.pipeline();
                         p.addLast(encoder);
                         p.addLast(new LoggingHandler(LogLevel.DEBUG));
-                        p.addLast(new IdleStateHandler(0, 0, 0));
-                        p.addLast(new LengthFieldBasedFrameDecoder(1024, 1, 1, 3, 0));
+                        p.addLast(new LengthFieldBasedFrameDecoder(
+                                ProtocolConstants.MAX_FRAME_LENGTH,
+                                ProtocolConstants.LENGTH_FIELD_OFFSET,
+                                ProtocolConstants.LENGTH_FIELD_LENGTH,
+                                ProtocolConstants.LENGTH_ADJUSTMENT, 0));
                         p.addLast(decoder);
                         p.addLast(new ClientHandler(NettyClient.this));
                     }
@@ -125,8 +134,6 @@ public class NettyClient {
         }
     }
 
-    // ── 协议流程 ──
-
     void sendRegistration(ChannelHandlerContext ctx) {
         var req = new RegistrationRequest(
                 config.terminalId(), config.manufacturerId(), "V1",
@@ -142,35 +149,30 @@ public class NettyClient {
     void startWorking(ChannelHandlerContext ctx) {
         log.info("工作循环启动 — 心跳:{}s 位置:{}s",
                 config.heartbeatIntervalSeconds(), config.locationIntervalSeconds());
-        // 定时心跳
         heartbeatTask = ctx.executor().scheduleAtFixedRate(
                 () -> sendHeartbeat(ctx),
                 config.heartbeatIntervalSeconds(),
                 config.heartbeatIntervalSeconds(),
                 TimeUnit.SECONDS);
-        // 定时位置上报
         locationTask = ctx.executor().scheduleAtFixedRate(
                 () -> sendLocation(ctx),
                 config.locationIntervalSeconds(),
                 config.locationIntervalSeconds(),
                 TimeUnit.SECONDS);
-
-        // 首次立刻上报一次位置
         sendLocation(ctx);
     }
 
-    // ── 业务消息发送 ──
-
     private void sendHeartbeat(ChannelHandlerContext ctx) {
         if (ctx.channel().isActive()) {
-            byte flags = (byte) 0x01; // ACC 开
-            var hb = new Heartbeat(config.terminalId(), nextSeq(), flags);
+            var hb = new Heartbeat(config.terminalId(), nextSeq(), HEARTBEAT_FLAGS);
             ctx.writeAndFlush(hb);
         }
     }
 
     private void sendLocation(ChannelHandlerContext ctx) {
-        if (!ctx.channel().isActive()) return;
+        if (!ctx.channel().isActive()) {
+            return;
+        }
 
         var point = simulator.nextPosition();
         var loc = new LocationReport(
@@ -182,8 +184,7 @@ public class NettyClient {
                 0, LocalDateTime.now(), nextSeq());
         ctx.writeAndFlush(loc);
 
-        // 随机 5% 概率发送告警
-        if (Math.random() < 0.05) {
+        if (Math.random() < ALARM_PROBABILITY) {
             var alarm = new AlarmReport(config.terminalId(), 1, 1,
                     point.latitude(), point.longitude(), point.speed(),
                     LocalDateTime.now(), "模拟测试告警");
@@ -191,12 +192,11 @@ public class NettyClient {
         }
     }
 
-    // ── 指令响应 ──
-
     void adjustLocationInterval(int seconds) {
         log.info("调整位置上报间隔: {}s (原: {}s)", seconds, originalLocationInterval);
-        // 重新调度
-        if (locationTask != null) locationTask.cancel(false);
+        if (locationTask != null) {
+            locationTask.cancel(false);
+        }
         if (channel != null && channel.isActive()) {
             locationTask = channel.eventLoop().scheduleAtFixedRate(
                     () -> sendLocation(channel.pipeline().lastContext()),
@@ -212,14 +212,16 @@ public class NettyClient {
         this.authCode = code;
     }
 
-    // ── 工具 ──
-
     private int nextSeq() {
         return ++seqNo;
     }
 
     private void cancelTimers() {
-        if (heartbeatTask != null) heartbeatTask.cancel(false);
-        if (locationTask != null) locationTask.cancel(false);
+        if (heartbeatTask != null) {
+            heartbeatTask.cancel(false);
+        }
+        if (locationTask != null) {
+            locationTask.cancel(false);
+        }
     }
 }

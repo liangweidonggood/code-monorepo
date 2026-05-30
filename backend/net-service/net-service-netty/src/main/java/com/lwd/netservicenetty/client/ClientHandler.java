@@ -1,6 +1,7 @@
 package com.lwd.netservicenetty.client;
 
 import com.lwd.netservicenetty.protocol.*;
+import com.lwd.netservicenetty.protocol.ProtocolConstants;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -71,7 +72,7 @@ public class ClientHandler extends SimpleChannelInboundHandler<TcpPacket> {
         if (resp.result() == 0) {
             log.info("应答成功 — 流水号: {} 应答类型: 0x{}", resp.serialNo(),
                     Integer.toHexString(resp.respMsgType() & 0xFF));
-            if (resp.respMsgType() == 0x02) {
+            if (resp.respMsgType() == ProtocolConstants.MSG_AUTH_REQUEST) {
                 // 鉴权应答成功，开始工作循环
                 client.startWorking(ctx);
             }
@@ -92,7 +93,7 @@ public class ClientHandler extends SimpleChannelInboundHandler<TcpPacket> {
 
     private void handleRemoteConfig(ChannelHandlerContext ctx, RemoteConfigCmd cmd) {
         log.info("收到远程配置 — 参数ID: {} 值长度: {}", cmd.paramId(), cmd.paramValue().length);
-        var resp = new CommonResponse(cmd.seqNo(), (short) 0x83, 0);
+        var resp = new CommonResponse(cmd.seqNo(), (short) ProtocolConstants.MSG_REMOTE_CONFIG, 0);
         ctx.writeAndFlush(resp);
     }
 

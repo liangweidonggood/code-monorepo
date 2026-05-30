@@ -1,6 +1,7 @@
 package com.lwd.netservicenetty.protocol.codec;
 
 import com.lwd.netservicenetty.protocol.MessageCodec;
+import com.lwd.netservicenetty.protocol.ProtocolConstants;
 import com.lwd.netservicenetty.protocol.RegistrationResponse;
 import io.netty.buffer.ByteBuf;
 import org.springframework.stereotype.Component;
@@ -17,7 +18,7 @@ public class RegistrationResponseCodec implements MessageCodec<RegistrationRespo
 
     @Override
     public int msgType() {
-        return 0x81;
+        return ProtocolConstants.MSG_REGISTRATION_RESPONSE;
     }
 
     @Override

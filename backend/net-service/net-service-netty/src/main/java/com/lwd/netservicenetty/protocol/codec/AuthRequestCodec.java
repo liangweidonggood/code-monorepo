@@ -1,6 +1,7 @@
 package com.lwd.netservicenetty.protocol.codec;
 
 import com.lwd.netservicenetty.protocol.MessageCodec;
+import com.lwd.netservicenetty.protocol.ProtocolConstants;
 import com.lwd.netservicenetty.protocol.AuthRequest;
 import io.netty.buffer.ByteBuf;
 import org.springframework.stereotype.Component;
@@ -15,7 +16,7 @@ public class AuthRequestCodec implements MessageCodec<AuthRequest> {
 
     @Override
     public int msgType() {
-        return 0x02;
+        return ProtocolConstants.MSG_AUTH_REQUEST;
     }
 
     @Override

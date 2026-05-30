@@ -13,3 +13,7 @@ netty:
       queue-capacity: 500
       keep-alive-seconds: 120
       thread-name-prefix: biz-worker-
+  client:
+    enabled: false
+    host: localhost
+    port: 9990

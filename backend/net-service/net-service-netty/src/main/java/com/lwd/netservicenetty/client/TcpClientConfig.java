@@ -9,6 +9,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  */
 @ConfigurationProperties(prefix = "netty.client")
 public record TcpClientConfig(
+        boolean enabled,
         String host,
         int port,
         int heartbeatIntervalSeconds,

@@ -24,6 +24,13 @@ import java.util.concurrent.TimeUnit;
 @RequiredArgsConstructor
 public class TcpServer {
 
+    private static final int BACKLOG_SIZE = 1024;
+    private static final int LOW_WATER_MARK_BYTES = 512 * 1024;
+    private static final int HIGH_WATER_MARK_BYTES = 1024 * 1024;
+    private static final int BOSS_THREADS = 1;
+    private static final int SHUTDOWN_QUIET_SECONDS = 2;
+    private static final int SHUTDOWN_TIMEOUT_SECONDS = 15;
+
     private final ChannelInitializer channelInitializer;
     private final NettyServerConfig config;
     private EventLoopGroup bossGroup;
@@ -40,24 +47,18 @@ public class TcpServer {
         IoHandlerFactory ioHandlerFactory = transport.factory();
         Class<? extends ServerChannel> channelClass = transport.channel();
         int workerThreads = Runtime.getRuntime().availableProcessors() * 2;
-        bossGroup = new MultiThreadIoEventLoopGroup(1, ioHandlerFactory);
+        bossGroup = new MultiThreadIoEventLoopGroup(BOSS_THREADS, ioHandlerFactory);
         workerGroup = new MultiThreadIoEventLoopGroup(workerThreads, ioHandlerFactory);
         ServerBootstrap b = new ServerBootstrap();
         b.group(bossGroup, workerGroup)
                 .channel(channelClass)
-                // 已完成三次握手但未被 accept 的连接队列大小
-                .option(ChannelOption.SO_BACKLOG, 1024)
-                // 允许快速重启时复用 TIME_WAIT 状态的端口
+                .option(ChannelOption.SO_BACKLOG, BACKLOG_SIZE)
                 .option(ChannelOption.SO_REUSEADDR, true)
-                // 启用 TCP KeepAlive 探测，及时清理死连接
                 .childOption(ChannelOption.SO_KEEPALIVE, true)
-                // 禁用 Nagle 算法，小数据包立即发送不等待合并
                 .childOption(ChannelOption.TCP_NODELAY, true)
-                // 默认配置，会根据系统支持情况，默认优先使用【堆外内存池】
                 .childOption(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
-                // 高低水位线配置，低512KB,高1MB
                 .childOption(ChannelOption.WRITE_BUFFER_WATER_MARK,
-                        new WriteBufferWaterMark(512 * 1024, 1024 * 1024))
+                        new WriteBufferWaterMark(LOW_WATER_MARK_BYTES, HIGH_WATER_MARK_BYTES))
                 .childHandler(channelInitializer);
         ChannelFuture bindFuture = b.bind(config.port()).awaitUninterruptibly();
         if (bindFuture.isSuccess()) {
@@ -77,10 +78,10 @@ public class TcpServer {
         }
         try {
             if (bossGroup != null) {
-                bossGroup.shutdownGracefully(2, 15, TimeUnit.SECONDS).syncUninterruptibly();
+                bossGroup.shutdownGracefully(SHUTDOWN_QUIET_SECONDS, SHUTDOWN_TIMEOUT_SECONDS, TimeUnit.SECONDS).syncUninterruptibly();
             }
             if (workerGroup != null) {
-                workerGroup.shutdownGracefully(2, 15, TimeUnit.SECONDS).syncUninterruptibly();
+                workerGroup.shutdownGracefully(SHUTDOWN_QUIET_SECONDS, SHUTDOWN_TIMEOUT_SECONDS, TimeUnit.SECONDS).syncUninterruptibly();
             }
         } catch (Exception e) {
             log.error("Netty 释放资源期间遭遇异常", e);

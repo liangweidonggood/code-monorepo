@@ -1,6 +1,7 @@
 package com.lwd.netservicenetty.protocol.codec;
 
 import com.lwd.netservicenetty.protocol.MessageCodec;
+import com.lwd.netservicenetty.protocol.ProtocolConstants;
 import com.lwd.netservicenetty.protocol.ImmediateReplayCmd;
 import io.netty.buffer.ByteBuf;
 import org.springframework.stereotype.Component;
@@ -15,7 +16,7 @@ public class ImmediateReplayCmdCodec implements MessageCodec<ImmediateReplayCmd>
 
     @Override
     public int msgType() {
-        return 0x82;
+        return ProtocolConstants.MSG_IMMEDIATE_REPLAY;
     }
 
     @Override

@@ -1,6 +1,7 @@
 package com.lwd.netservicenetty.protocol.codec;
 
 import com.lwd.netservicenetty.protocol.MessageCodec;
+import com.lwd.netservicenetty.protocol.ProtocolConstants;
 import com.lwd.netservicenetty.protocol.LocationReport;
 import io.netty.buffer.ByteBuf;
 import org.springframework.stereotype.Component;
@@ -15,7 +16,7 @@ public class LocationReportCodec implements MessageCodec<LocationReport> {
 
     @Override
     public int msgType() {
-        return 0x10;
+        return ProtocolConstants.MSG_LOCATION_REPORT;
     }
 
     @Override
