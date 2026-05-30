@@ -1,4 +1,4 @@
-package com.lwd.netservicenetty.server;
+package com.lwd.netservicenetty.core.internal.handler;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler;

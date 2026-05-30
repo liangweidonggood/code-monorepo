@@ -1,4 +1,4 @@
-package com.lwd.netservicenetty.server;
+package com.lwd.netservicenetty.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 

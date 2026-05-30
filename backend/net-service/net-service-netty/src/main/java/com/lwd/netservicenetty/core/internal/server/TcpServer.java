@@ -1,5 +1,7 @@
-package com.lwd.netservicenetty.server;
+package com.lwd.netservicenetty.core.internal.server;
 
+import com.lwd.netservicenetty.config.NettyServerConfig;
+import com.lwd.netservicenetty.transport.Transport;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.*;
@@ -22,7 +24,7 @@ import java.util.concurrent.TimeUnit;
 @RequiredArgsConstructor
 public class TcpServer {
 
-    private final MyChannelInitializer myChannelInitializer;
+    private final ChannelInitializer channelInitializer;
     private final NettyServerConfig config;
     private EventLoopGroup bossGroup;
     private EventLoopGroup workerGroup;
@@ -56,7 +58,7 @@ public class TcpServer {
                 // 高低水位线配置，低512KB,高1MB
                 .childOption(ChannelOption.WRITE_BUFFER_WATER_MARK,
                         new WriteBufferWaterMark(512 * 1024, 1024 * 1024))
-                .childHandler(myChannelInitializer);
+                .childHandler(channelInitializer);
         ChannelFuture bindFuture = b.bind(config.port()).awaitUninterruptibly();
         if (bindFuture.isSuccess()) {
             serverChannel = bindFuture.channel();

@@ -1,4 +1,4 @@
-package com.lwd.netservicenetty.server;
+package com.lwd.netservicenetty.config;
 
 import io.netty.handler.logging.LogLevel;
 import org.springframework.boot.context.properties.ConfigurationProperties;

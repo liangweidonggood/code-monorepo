@@ -1,4 +1,4 @@
-package com.lwd.netservicenetty.server;
+package com.lwd.netservicenetty.config;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;

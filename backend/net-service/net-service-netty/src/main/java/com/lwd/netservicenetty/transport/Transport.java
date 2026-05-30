@@ -1,4 +1,4 @@
-package com.lwd.netservicenetty.server;
+package com.lwd.netservicenetty.transport;
 
 import io.netty.channel.IoHandlerFactory;
 import io.netty.channel.ServerChannel;
