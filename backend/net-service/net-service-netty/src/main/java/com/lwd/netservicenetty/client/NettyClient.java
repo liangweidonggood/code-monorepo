@@ -30,12 +30,8 @@ import java.util.concurrent.TimeUnit;
 @Component
 public class NettyClient {
 
-    private static final double GPS_START_LAT = 39.9;
-    private static final double GPS_START_LNG = 116.3;
-    private static final double GPS_START_SPEED = 60.0;
-    private static final double GPS_STEP_DEG = 0.0008;
-    private static final double ALARM_PROBABILITY = 0.05;
-    private static final byte HEARTBEAT_FLAGS = (byte) 0x01;
+    /** 心跳状态位：ACC 开 */
+    private static final byte HEARTBEAT_ACC_ON = (byte) 0x01;
 
     private final TcpClientConfig config;
     private final ProtocolFrameEncoder encoder;
@@ -57,7 +53,7 @@ public class NettyClient {
         this.config = config;
         this.encoder = encoder;
         this.decoder = decoder;
-        this.simulator = new GpsTrackSimulator(GPS_START_LAT, GPS_START_LNG, GPS_START_SPEED, GPS_STEP_DEG);
+        this.simulator = new GpsTrackSimulator(39.9, 116.3, 60.0, 0.0008);  // 北京天安门起始，60km/h，每次约89m;
         this.originalLocationInterval = config.locationIntervalSeconds();
     }
 
@@ -164,7 +160,7 @@ public class NettyClient {
 
     private void sendHeartbeat(ChannelHandlerContext ctx) {
         if (ctx.channel().isActive()) {
-            var hb = new Heartbeat(config.terminalId(), nextSeq(), HEARTBEAT_FLAGS);
+            var hb = new Heartbeat(config.terminalId(), nextSeq(), HEARTBEAT_ACC_ON);
             ctx.writeAndFlush(hb);
         }
     }
@@ -184,7 +180,7 @@ public class NettyClient {
                 0, LocalDateTime.now(), nextSeq());
         ctx.writeAndFlush(loc);
 
-        if (Math.random() < ALARM_PROBABILITY) {
+        if (Math.random() < 0.05) {
             var alarm = new AlarmReport(config.terminalId(), 1, 1,
                     point.latitude(), point.longitude(), point.speed(),
                     LocalDateTime.now(), "模拟测试告警");

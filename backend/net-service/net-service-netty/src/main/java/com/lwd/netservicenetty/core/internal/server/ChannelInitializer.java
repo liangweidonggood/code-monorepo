@@ -20,18 +20,23 @@ import org.springframework.stereotype.Component;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Pipeline 装配工厂 — 入站/出站双重编解码
+ * Pipeline 装配工厂
+ * <p>
+ * 入站方向:
+ *   流量整形(限速 2MB/s) → 日志 → 背压保护 → 空闲检测(60s) → 超时断开
+ *   → 魔数校验(0xFE) → 长度拆包 → 协议解码(ByteBuf→TcpPacket) → 业务处理
+ * <p>
+ * 出站方向:
+ *   协议编码(TcpPacket→ByteBuf) → 网络
+ * <p>
+ * 协议帧格式: [FE:1B] [len:1B] [type:1B] [sub:1B] [body:N B] [BCC:1B]
+ * length 字段仅代表 body 的字节数，不含帧头帧尾。
  *
  * @author Administrator
  */
 @Component
 @RequiredArgsConstructor
 public class ChannelInitializer extends io.netty.channel.ChannelInitializer<SocketChannel> {
-
-    private static final long WRITE_LIMIT_DISABLED = 0;
-    private static final long READ_LIMIT_BPS = 2 * 1024 * 1024;
-    private static final long CHECK_INTERVAL_MS = 1000;
-    private static final int IDLE_TIMEOUT_SECONDS = 60;
 
     private final MonitorDataHandler monitorDataHandler;
     private final NettyServerConfig config;
@@ -45,22 +50,31 @@ public class ChannelInitializer extends io.netty.channel.ChannelInitializer<Sock
     protected void initChannel(SocketChannel ch) {
         ChannelPipeline pipeline = ch.pipeline();
 
-        // 出站：TcpPacket → ByteBuf 帧 → 网络
+        // 出站：TcpPacket → ByteBuf 帧
         pipeline.addLast(protocolFrameEncoder);
 
-        // 入站：流量整形 → 日志 → 背压 → 心跳 → 超时 → 魔数校验 → 拆包 → 帧解码 → 业务
-        pipeline.addLast(new ChannelTrafficShapingHandler(WRITE_LIMIT_DISABLED, READ_LIMIT_BPS, CHECK_INTERVAL_MS));
+        // 入站：流量整形，限速 2MB/s 上传，每秒计算一次
+        pipeline.addLast(new ChannelTrafficShapingHandler(0, 2L * 1024 * 1024, 1000));
+        // 网络层日志
         pipeline.addLast(new LoggingHandler(config.logLevel()));
+        // 背压保护：高水位停读，低水位恢复
         pipeline.addLast(safeTrafficHandler);
-        pipeline.addLast(new IdleStateHandler(IDLE_TIMEOUT_SECONDS, 0, 0, TimeUnit.SECONDS));
+        // 心跳检测：60 秒无读触发 IdleStateEvent
+        pipeline.addLast(new IdleStateHandler(60, 0, 0, TimeUnit.SECONDS));
+        // 空闲超时断开（背压中的假空闲跳过）
         pipeline.addLast(serverTimeoutHandler);
+        // 魔数校验：非 0xFE 直接掐断
         pipeline.addLast(protocolGuardHandler);
+        // 帧拆包：按长度字段切出完整帧
         pipeline.addLast(new LengthFieldBasedFrameDecoder(
                 ProtocolConstants.MAX_FRAME_LENGTH,
                 ProtocolConstants.LENGTH_FIELD_OFFSET,
                 ProtocolConstants.LENGTH_FIELD_LENGTH,
-                ProtocolConstants.LENGTH_ADJUSTMENT, 0));
+                ProtocolConstants.LENGTH_ADJUSTMENT,
+                0));
+        // 协议解码：ByteBuf 帧 → TcpPacket
         pipeline.addLast(protocolFrameDecoder);
+        // 业务终点站
         pipeline.addLast(monitorDataHandler);
     }
 }
