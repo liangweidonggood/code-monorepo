@@ -1,7 +1,6 @@
 # 通用
 *.md
 *.json
-*.html
 pnpm-workspace.yaml
 
 # 依赖目录
