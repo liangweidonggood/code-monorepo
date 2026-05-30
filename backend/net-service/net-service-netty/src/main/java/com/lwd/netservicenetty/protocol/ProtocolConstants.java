@@ -7,7 +7,9 @@ package com.lwd.netservicenetty.protocol;
  */
 public final class ProtocolConstants {
 
-    private ProtocolConstants() {}
+    private ProtocolConstants() {
+        throw new UnsupportedOperationException("常量类不可实例化");
+    }
 
     /** 帧头魔数 */
     public static final byte MAGIC_NUMBER = (byte) 0xFE;

@@ -9,7 +9,9 @@ import io.netty.buffer.ByteBuf;
  */
 final class BcdUtils {
 
-    private BcdUtils() { /* 工具类禁止实例化 */ }
+    private BcdUtils() {
+        throw new UnsupportedOperationException("工具类不可实例化");
+    }
 
     /** 将 ByteBuf 中的 BCD 字节解码为数字字符串 */
     static String readBcd(ByteBuf in, int length) {

@@ -94,7 +94,8 @@ public class TcpServer {
             if (workerGroup != null) {
                 workerGroup.shutdownGracefully(2, 15, TimeUnit.SECONDS).syncUninterruptibly();
             }
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
+            // Netty shutdownGracefully 可能因线程池已关闭等原因抛出运行时异常
             log.error("Netty 释放资源期间遭遇异常", e);
         }
         log.info("Netty 优雅停机完成。");

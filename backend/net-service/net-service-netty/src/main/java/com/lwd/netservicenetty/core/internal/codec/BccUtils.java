@@ -9,7 +9,9 @@ import io.netty.buffer.ByteBuf;
  */
 public final class BccUtils {
 
-    private BccUtils() { /* 工具类禁止实例化 */ }
+    private BccUtils() {
+        throw new UnsupportedOperationException("工具类不可实例化");
+    }
 
     /** 计算 BCC 异或校验码 */
     public static byte compute(ByteBuf body, int bodyLen) {
