@@ -1,4 +1,6 @@
-# 开发指南
+# net-service-netty 开发指南
+
+> 所属: [net-service-monorepo](./README.md) ｜ 协议: [VTP](./VTP-协议规范.md)
 
 ## 快速开始
 

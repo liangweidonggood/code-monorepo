@@ -1,5 +1,8 @@
 # VTP 协议规范 (Vehicle Tracking Protocol)
 
+> 本文档是 net-service-monorepo 所有语言实现的**公共契约**。
+> 后端实现: [net-service-netty](./net-service-netty-架构设计.md) · net-service-go · net-service-rust
+
 ## 1. 帧结构
 
 ```

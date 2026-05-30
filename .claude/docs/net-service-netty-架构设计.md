@@ -1,4 +1,6 @@
-# 架构设计文档 — net-service-netty
+# net-service-netty 架构设计
+
+> 所属: [net-service-monorepo](./README.md) ｜ 协议: [VTP](./VTP-协议规范.md) ｜ 同级: net-service-go, net-service-rust, frontend
 
 ## 1. 模块拓扑
 
