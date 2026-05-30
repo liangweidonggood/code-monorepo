@@ -1,13 +1,17 @@
 # net-service
 
-网络服务
+VTP 协议的多语言网络服务实现。
 
-多语言来实现，java-netty,golang,rust
+## 子项目
 
-# TCP服务
+| 目录 | 语言 | 框架 | 端口 |
+|------|------|------|------|
+| [net-service-netty](./net-service-netty/) | Java 21 | Netty 4.2 + Spring Boot 4 | 8888 |
+| [net-service-go](./net-service-go/) | Go | 标准库 net | — |
+| [net-service-rust](./net-service-rust/) | Rust | Tokio | — |
 
-协议
+## 协议
 
-fe 04 73 01 00 86 eb 02 19
+VTP 帧格式: `[FE] [len] [type] [sub] [body...] [BCC]`
 
-fe是个魔法，04是个长度，第三个字节是代表消息类型第四个节字代表子消息类型，5-8是数据，最后一位是crc校验码
+详见: [VTP 协议规范](../../.claude/docs/VTP-协议规范.md)
