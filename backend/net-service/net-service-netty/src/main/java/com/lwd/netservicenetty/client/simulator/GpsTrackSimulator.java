@@ -69,8 +69,8 @@ public class GpsTrackSimulator {
             heading = (heading + Math.PI) % (2 * Math.PI);
         }
 
-        int alt = ALT_BASE_M + (int) (ThreadLocalRandom.current().nextDouble() * ALT_RANGE_M);
-        int sat = SAT_MIN + (int) (ThreadLocalRandom.current().nextDouble() * SAT_RANGE);
+        int alt = ALT_BASE_M + ThreadLocalRandom.current().nextInt(ALT_RANGE_M);
+        int sat = SAT_MIN + ThreadLocalRandom.current().nextInt(SAT_RANGE);
         int fuel = Math.max(0, 100 - counter / FUEL_DECREASE_RATE);
 
         return new GpsPoint(lat, lng, (int) speed, alt, sat, fuel);
