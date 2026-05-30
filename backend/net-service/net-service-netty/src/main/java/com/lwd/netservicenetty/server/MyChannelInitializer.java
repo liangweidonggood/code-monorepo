@@ -4,6 +4,7 @@ import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
+import io.netty.handler.logging.LoggingHandler;
 import io.netty.handler.timeout.IdleStateHandler;
 import io.netty.handler.traffic.ChannelTrafficShapingHandler;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +22,7 @@ import java.util.concurrent.TimeUnit;
 public class MyChannelInitializer extends ChannelInitializer<SocketChannel> {
 
     private final MonitorDataHandler monitorDataHandler;
+    private final NettyServerConfig config;
     private final SafeTrafficHandler safeTrafficHandler;
     private final ServerTimeoutHandler serverTimeoutHandler;
     private final ProtocolGuardHandler protocolGuardHandler;
@@ -38,6 +40,7 @@ public class MyChannelInitializer extends ChannelInitializer<SocketChannel> {
                 2L * 1024 * 1024,
                 1000
         ));
+        pipeline.addLast(new LoggingHandler(config.logLevel()));
         pipeline.addLast(safeTrafficHandler);
         // 心跳处理，60秒没数据过来就推送一个心跳事件
         pipeline.addLast(new IdleStateHandler(60, 0, 0, TimeUnit.SECONDS));

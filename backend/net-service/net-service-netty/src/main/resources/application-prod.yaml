@@ -1,0 +1,9 @@
+spring:
+  config:
+    activate:
+      on-profile: prod
+
+netty:
+  server:
+    port: 9999
+    log-level: WARN

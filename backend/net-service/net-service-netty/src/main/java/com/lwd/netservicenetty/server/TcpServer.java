@@ -23,6 +23,7 @@ import java.util.concurrent.TimeUnit;
 public class TcpServer {
 
     private final MyChannelInitializer myChannelInitializer;
+    private final NettyServerConfig config;
     private EventLoopGroup bossGroup;
     private EventLoopGroup workerGroup;
     private Channel serverChannel;
@@ -56,7 +57,7 @@ public class TcpServer {
                 .childOption(ChannelOption.WRITE_BUFFER_WATER_MARK,
                         new WriteBufferWaterMark(512 * 1024, 1024 * 1024))
                 .childHandler(myChannelInitializer);
-        ChannelFuture bindFuture = b.bind(8888).awaitUninterruptibly();
+        ChannelFuture bindFuture = b.bind(config.port()).awaitUninterruptibly();
         if (bindFuture.isSuccess()) {
             serverChannel = bindFuture.channel();
             log.info("Netty tcp server 启动成功！");

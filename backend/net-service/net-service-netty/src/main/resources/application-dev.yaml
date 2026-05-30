@@ -2,3 +2,7 @@ spring:
   config:
     activate:
       on-profile: dev
+
+netty:
+  server:
+    log-level: DEBUG

@@ -3,3 +3,8 @@ spring:
     name: net-service-netty
   profiles:
     active: dev
+
+netty:
+  server:
+    port: 8888
+    log-level: INFO
