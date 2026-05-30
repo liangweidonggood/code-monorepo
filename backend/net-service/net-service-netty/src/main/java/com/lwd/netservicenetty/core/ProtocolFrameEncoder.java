@@ -1,8 +1,9 @@
-package com.lwd.netservicenetty.core.internal.codec;
+package com.lwd.netservicenetty.core;
 
-import com.lwd.netservicenetty.protocol.TcpPacket;
-
+import com.lwd.netservicenetty.core.internal.codec.BccUtils;
+import com.lwd.netservicenetty.core.internal.codec.MessageCodecRegistry;
 import com.lwd.netservicenetty.protocol.MessageCodec;
+import com.lwd.netservicenetty.protocol.TcpPacket;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandler;
@@ -34,9 +35,8 @@ public class ProtocolFrameEncoder extends MessageToByteEncoder<TcpPacket> {
     protected void encode(ChannelHandlerContext ctx, TcpPacket packet, ByteBuf out) {
         MessageCodec<TcpPacket> codec = (MessageCodec<TcpPacket>) registry.lookup(msgTypeOf(packet));
         int msgType = codec.msgType();
-        byte subMsgType = 0; // TODO: 加密子类型扩展点
+        byte subMsgType = 0; // 加密子类型扩展点
 
-        // 先编码 body 到临时 buffer
         ByteBuf bodyBuf = Unpooled.buffer();
         try {
             codec.encode(packet, bodyBuf);
@@ -45,30 +45,25 @@ public class ProtocolFrameEncoder extends MessageToByteEncoder<TcpPacket> {
             // 计算 BCC（必须在 write 之前，否则 readerIndex 会被消耗）
             byte bcc = BccUtils.computeFrame((byte) bodyLen, (byte) msgType, subMsgType, bodyBuf);
 
-            // 写帧头
             out.writeByte(MAGIC);
             out.writeByte(bodyLen);
             out.writeByte(msgType);
             out.writeByte(subMsgType);
-
-            // 写 body
             out.writeBytes(bodyBuf);
-
-            // 写 BCC
             out.writeByte(bcc);
         } finally {
             bodyBuf.release();
         }
     }
 
-    /** 暴露给单元测试：编码为独立 ByteBuf */
-    ByteBuf encode(TcpPacket packet) {
+    /** 暴露给单元测试 */
+    public ByteBuf encode(TcpPacket packet) {
         ByteBuf out = Unpooled.buffer();
         encode(null, packet, out);
         return out;
     }
+
     private int msgTypeOf(TcpPacket packet) {
-        // 直接使用与 codec 注册一致的映射
         if (packet instanceof com.lwd.netservicenetty.protocol.CommonResponse) return 0x00;
         if (packet instanceof com.lwd.netservicenetty.protocol.RegistrationRequest) return 0x01;
         if (packet instanceof com.lwd.netservicenetty.protocol.AuthRequest) return 0x02;

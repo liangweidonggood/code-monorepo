@@ -1,5 +1,3 @@
-/**
- * Netty 客户端模块 — 依赖 core 和 protocol
- */
-@org.springframework.modulith.ApplicationModule(allowedDependencies = {"protocol", "core"})
+/** Netty 客户端模块 */
+@org.springframework.modulith.ApplicationModule(allowedDependencies = {"protocol", "core", "config", "transport"})
 package com.lwd.netservicenetty.client;
