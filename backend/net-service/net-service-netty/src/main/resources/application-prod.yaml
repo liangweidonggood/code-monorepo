@@ -7,3 +7,9 @@ netty:
   server:
     port: 9999
     log-level: WARN
+    business-thread-pool:
+      core-pool-size: 8
+      max-pool-size: 16
+      queue-capacity: 500
+      keep-alive-seconds: 120
+      thread-name-prefix: biz-worker-

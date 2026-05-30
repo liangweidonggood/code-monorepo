@@ -8,3 +8,9 @@ netty:
   server:
     port: 8888
     log-level: INFO
+    business-thread-pool:
+      core-pool-size: 4
+      max-pool-size: 8
+      queue-capacity: 200
+      keep-alive-seconds: 60
+      thread-name-prefix: biz-worker-
