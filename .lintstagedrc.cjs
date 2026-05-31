@@ -7,8 +7,10 @@ module.exports = {
         "pnpm stylelint:check",
         "pnpm format:check"
     ],
-    "**/*.java": () => [
-        "pnpm net-service-netty:check",
+    "backend/net-service/net-service-netty/**/*.java": () => [
+        "pnpm net-service-netty:check"
+    ],
+    "backend/net-service/net-service-netty-client/**/*.java": () => [
         "pnpm net-service-netty-client:check"
     ]
 };
