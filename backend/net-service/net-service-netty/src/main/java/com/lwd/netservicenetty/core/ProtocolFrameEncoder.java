@@ -10,6 +10,7 @@ import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 /**
@@ -21,13 +22,10 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @ChannelHandler.Sharable
+@RequiredArgsConstructor
 public class ProtocolFrameEncoder extends MessageToByteEncoder<TcpPacket> {
 
     private final MessageCodecRegistry registry;
-
-    public ProtocolFrameEncoder(MessageCodecRegistry registry) {
-        this.registry = registry;
-    }
 
     @Override
     @SuppressWarnings("unchecked")

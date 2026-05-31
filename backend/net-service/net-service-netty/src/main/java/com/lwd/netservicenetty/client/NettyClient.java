@@ -29,9 +29,9 @@ import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
+import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -45,6 +45,9 @@ public class NettyClient {
 
     /** 心跳状态位：ACC 开 */
     private static final byte HEARTBEAT_ACC_ON = (byte) 0x01;
+    /** 模拟告警触发概率 */
+    private static final double SIMULATED_ALARM_RATE = 0.05;
+    private static final SecureRandom RNG = new SecureRandom();
 
     private final TcpClientConfig config;
     private final ProtocolFrameEncoder encoder;
@@ -58,7 +61,7 @@ public class NettyClient {
     private String authCode;
     private int seqNo;
     private int reconnectAttempt;
-    private int originalLocationInterval;
+    private final int originalLocationInterval;
 
     public NettyClient(TcpClientConfig config,
                        ProtocolFrameEncoder encoder,
@@ -66,7 +69,7 @@ public class NettyClient {
         this.config = config;
         this.encoder = encoder;
         this.decoder = decoder;
-        this.simulator = new GpsTrackSimulator(39.9, 116.3, 60.0, 0.0008);  // 北京天安门起始，60km/h，每次约89m;
+        this.simulator = new GpsTrackSimulator(39.9, 116.3, 60.0, 0.0008);  // 北京天安门起始，60km/h，每次约89m
         this.originalLocationInterval = config.locationIntervalSeconds();
     }
 
@@ -103,7 +106,7 @@ public class NettyClient {
                 .option(ChannelOption.TCP_NODELAY, true)
                 .option(ChannelOption.SO_KEEPALIVE, true)
                 .option(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
-                .handler(new ChannelInitializer<Channel>() {
+                .handler(new ChannelInitializer<>() {
                     @Override
                     protected void initChannel(Channel ch) {
                         ChannelPipeline p = ch.pipeline();
@@ -155,6 +158,12 @@ public class NettyClient {
         ctx.writeAndFlush(req);
     }
 
+    /**
+     * 启动心跳和位置上报定时任务。
+     * <p>
+     * 使用 Netty 事件循环的定时器，不由我们管理生命周期，因此抑制 resource 警告。
+     */
+    @SuppressWarnings("resource")
     void startWorking(ChannelHandlerContext ctx) {
         log.info("工作循环启动 — 心跳:{}s 位置:{}s",
                 config.heartbeatIntervalSeconds(), config.locationIntervalSeconds());
@@ -193,7 +202,7 @@ public class NettyClient {
                 0, LocalDateTime.now(), nextSeq());
         ctx.writeAndFlush(loc);
 
-        if (ThreadLocalRandom.current().nextDouble() < 0.05) {
+        if (RNG.nextDouble() < SIMULATED_ALARM_RATE) {
             var alarm = new AlarmReport(config.terminalId(), 1, 1,
                     point.latitude(), point.longitude(), point.speed(),
                     LocalDateTime.now(), "模拟测试告警");
@@ -201,6 +210,12 @@ public class NettyClient {
         }
     }
 
+    /**
+     * 调整位置上报间隔，取消旧定时器后按新间隔重新调度。
+     * <p>
+     * 使用 Netty 事件循环的定时器，不由我们管理生命周期，因此抑制 resource 警告。
+     */
+    @SuppressWarnings("resource")
     void adjustLocationInterval(int seconds) {
         log.info("调整位置上报间隔: {}s (原: {}s)", seconds, originalLocationInterval);
         if (locationTask != null) {

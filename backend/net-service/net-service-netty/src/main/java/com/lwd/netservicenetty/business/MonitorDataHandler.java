@@ -27,17 +27,17 @@ public class MonitorDataHandler extends SimpleChannelInboundHandler<TcpPacket> {
 
         switch (packet) {
             case com.lwd.netservicenetty.protocol.RegistrationRequest req ->
-                    handleRegistration(ctx, req);
+                    handleRegistration(req);
             case com.lwd.netservicenetty.protocol.AuthRequest req ->
-                    handleAuth(ctx, req);
+                    handleAuth(req);
             case com.lwd.netservicenetty.protocol.Heartbeat hb ->
-                    handleHeartbeat(ctx, hb);
+                    handleHeartbeat(hb);
             case com.lwd.netservicenetty.protocol.LocationReport loc ->
-                    handleLocation(ctx, loc);
+                    handleLocation(loc);
             case com.lwd.netservicenetty.protocol.AlarmReport alarm ->
-                    handleAlarm(ctx, alarm);
+                    handleAlarm(alarm);
             case com.lwd.netservicenetty.protocol.CommonResponse resp ->
-                    handleCommonResponse(ctx, resp);
+                    handleCommonResponse(resp);
             default ->
                     log.warn("未处理的报文类型: {}", packet.getClass().getSimpleName());
         }
@@ -51,38 +51,38 @@ public class MonitorDataHandler extends SimpleChannelInboundHandler<TcpPacket> {
 
     // ── 业务处理器 ──
 
-    private void handleRegistration(ChannelHandlerContext ctx, com.lwd.netservicenetty.protocol.RegistrationRequest req) {
+    private void handleRegistration(com.lwd.netservicenetty.protocol.RegistrationRequest req) {
         log.info("【注册】终端: {} 厂商: {} 设备型号: {} 车牌: {}",
                 req.terminalId(), req.manufacturerId(), req.terminalModel(), req.licensePlate());
-        // TODO: 持久化 + 生成鉴权码，回复 RegistrationResponse
+        // 规划: 持久化 + 生成鉴权码，回复 RegistrationResponse
     }
 
-    private void handleAuth(ChannelHandlerContext ctx, com.lwd.netservicenetty.protocol.AuthRequest req) {
+    private void handleAuth(com.lwd.netservicenetty.protocol.AuthRequest req) {
         log.info("【鉴权】终端: {} 鉴权码: {} 流水号: {}", req.terminalId(), req.authCode(), req.seqNo());
-        // TODO: 验证鉴权码，发送 CommonResponse
+        // 规划: 验证鉴权码，发送 CommonResponse
     }
 
-    private void handleHeartbeat(ChannelHandlerContext ctx, com.lwd.netservicenetty.protocol.Heartbeat hb) {
+    private void handleHeartbeat(com.lwd.netservicenetty.protocol.Heartbeat hb) {
         log.debug("【心跳】终端: {} 流水号: {} 状态: 0x{}",
                 hb.terminalId(), hb.seqNo(), Integer.toHexString(hb.statusFlags() & 0xFF));
     }
 
-    private void handleLocation(ChannelHandlerContext ctx, com.lwd.netservicenetty.protocol.LocationReport loc) {
+    private void handleLocation(com.lwd.netservicenetty.protocol.LocationReport loc) {
         log.info("【位置】终端: {} 经纬度: ({}, {}) 速度: {}km/h 方向: {}° 里程: {}km 油量: {}% 卫星: {}",
                 loc.terminalId(), loc.latitude(), loc.longitude(),
                 loc.speed(), loc.direction(), loc.mileage(),
                 loc.fuelPercent(), loc.satellites());
-        // TODO: 持久化位置数据
+        // 规划: 持久化位置数据
     }
 
-    private void handleAlarm(ChannelHandlerContext ctx, com.lwd.netservicenetty.protocol.AlarmReport alarm) {
+    private void handleAlarm(com.lwd.netservicenetty.protocol.AlarmReport alarm) {
         log.warn("【告警!!】终端: {} 类型: {} 等级: {} 位置: ({}, {}) 描述: {}",
                 alarm.terminalId(), alarm.alarmType(), alarm.alarmLevel(),
                 alarm.latitude(), alarm.longitude(), alarm.description());
-        // TODO: 推送告警到监控中心
+        // 规划: 推送告警到监控中心
     }
 
-    private void handleCommonResponse(ChannelHandlerContext ctx, com.lwd.netservicenetty.protocol.CommonResponse resp) {
+    private void handleCommonResponse(com.lwd.netservicenetty.protocol.CommonResponse resp) {
         log.info("【应答】流水号: {} 应答类型: 0x{} 结果: {}",
                 resp.serialNo(), Integer.toHexString(resp.respMsgType() & 0xFF), resp.result());
     }

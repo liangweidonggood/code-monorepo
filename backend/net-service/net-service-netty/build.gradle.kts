@@ -2,6 +2,15 @@ plugins {
     java
     id("org.springframework.boot") version "4.0.6"
     id("io.spring.dependency-management") version "1.1.7"
+    id("org.sonarqube") version "7.3.0.8198"
+}
+
+sonar {
+    properties {
+        property("sonar.host.url", "http://172.19.248.184:9000")
+        property("sonar.projectKey", "code-monorepo_net-service-netty")
+        property("sonar.projectName", "net-service-netty")
+    }
 }
 
 group = "com.lwd"
@@ -19,10 +28,11 @@ repositories {
 }
 
 extra["springModulithVersion"] = "2.0.6"
+extra["nettyVersion"] = "4.2.14.Final"
 
 dependencies {
     // Source: https://mvnrepository.com/artifact/io.netty/netty-all
-    implementation("io.netty:netty-all:4.2.14.Final")
+    implementation("io.netty:netty-all:${property("nettyVersion")}")
     implementation("org.springframework.boot:spring-boot-starter-webmvc")
     implementation("org.springframework.modulith:spring-modulith-starter-core")
     compileOnly("org.projectlombok:lombok")

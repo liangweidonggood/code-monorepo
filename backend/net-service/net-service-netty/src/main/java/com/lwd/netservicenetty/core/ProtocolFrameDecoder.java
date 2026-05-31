@@ -8,6 +8,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageDecoder;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -21,13 +22,10 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 @ChannelHandler.Sharable
+@RequiredArgsConstructor
 public class ProtocolFrameDecoder extends MessageToMessageDecoder<ByteBuf> {
 
     private final MessageCodecRegistry registry;
-
-    public ProtocolFrameDecoder(MessageCodecRegistry registry) {
-        this.registry = registry;
-    }
 
     @Override
     @SuppressWarnings("unchecked")
@@ -37,7 +35,7 @@ public class ProtocolFrameDecoder extends MessageToMessageDecoder<ByteBuf> {
         frame.readByte(); // FE
         int bodyLen = frame.readUnsignedByte();
         int msgType = frame.readUnsignedByte();
-        int subMsgType = frame.readUnsignedByte();
+        frame.readUnsignedByte(); // subMsgType
 
         // BCC 校验：从 length 字节开始（跳过 FE），到 body 结束
         int bccDataLen = 3 + bodyLen;

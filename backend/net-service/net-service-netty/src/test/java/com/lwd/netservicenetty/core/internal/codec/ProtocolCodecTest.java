@@ -2,12 +2,9 @@ package com.lwd.netservicenetty.core.internal.codec;
 
 import com.lwd.netservicenetty.core.ProtocolFrameDecoder;
 import com.lwd.netservicenetty.core.ProtocolFrameEncoder;
-import com.lwd.netservicenetty.core.internal.codec.MessageCodecRegistry;
 import com.lwd.netservicenetty.protocol.CommonResponse;
-import com.lwd.netservicenetty.protocol.MessageCodec;
 import com.lwd.netservicenetty.protocol.codec.CommonResponseCodec;
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -47,7 +44,7 @@ class ProtocolCodecTest {
         var decoded = (CommonResponse) result;
         assertThat(decoded.serialNo()).isEqualTo(1);
         assertThat(decoded.respMsgType()).isEqualTo((short) 0);
-        assertThat(decoded.result()).isEqualTo(0);
+        assertThat(decoded.result()).isZero();
 
         frame.release();
     }

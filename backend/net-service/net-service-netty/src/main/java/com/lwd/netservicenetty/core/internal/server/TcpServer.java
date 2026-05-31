@@ -35,7 +35,7 @@ public class TcpServer {
     private static final int LOW_WATER_MARK = 512 * 1024;
     private static final int HIGH_WATER_MARK = 1024 * 1024;
 
-    private final ChannelInitializer channelInitializer;
+    private final ServerChannelInitializer channelInitializer;
     private final NettyServerConfig config;
     private EventLoopGroup bossGroup;
     private EventLoopGroup workerGroup;

@@ -36,7 +36,7 @@ import java.util.concurrent.TimeUnit;
  */
 @Component
 @RequiredArgsConstructor
-public class ChannelInitializer extends io.netty.channel.ChannelInitializer<SocketChannel> {
+public class ServerChannelInitializer extends io.netty.channel.ChannelInitializer<SocketChannel> {
 
     private final MonitorDataHandler monitorDataHandler;
     private final NettyServerConfig config;

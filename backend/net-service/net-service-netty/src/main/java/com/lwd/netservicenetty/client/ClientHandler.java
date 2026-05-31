@@ -22,13 +22,10 @@ import java.util.concurrent.TimeUnit;
  */
 @Slf4j
 @ChannelHandler.Sharable
+@RequiredArgsConstructor
 public class ClientHandler extends SimpleChannelInboundHandler<TcpPacket> {
 
     private final NettyClient client;
-
-    public ClientHandler(NettyClient client) {
-        this.client = client;
-    }
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, TcpPacket packet) {
@@ -37,7 +34,7 @@ public class ClientHandler extends SimpleChannelInboundHandler<TcpPacket> {
             case CommonResponse resp -> handleCommonResponse(ctx, resp);
             case ImmediateReplayCmd cmd -> handleImmediateReplay(ctx, cmd);
             case RemoteConfigCmd cmd -> handleRemoteConfig(ctx, cmd);
-            case DataTransmission data -> handleDataDispatch(ctx, data);
+            case DataTransmission data -> handleDataDispatch(data);
             default -> log.debug("客户端未处理的消息: {}", packet.getClass().getSimpleName());
         }
     }
@@ -91,7 +88,7 @@ public class ClientHandler extends SimpleChannelInboundHandler<TcpPacket> {
         client.adjustLocationInterval(cmd.uploadInterval());
         if (cmd.duration() > 0) {
             ctx.executor().schedule(
-                    () -> client.resetLocationInterval(),
+                    client::resetLocationInterval,
                     cmd.duration(), TimeUnit.SECONDS);
         }
     }
@@ -102,7 +99,7 @@ public class ClientHandler extends SimpleChannelInboundHandler<TcpPacket> {
         ctx.writeAndFlush(resp);
     }
 
-    private void handleDataDispatch(ChannelHandlerContext ctx, DataTransmission data) {
+    private void handleDataDispatch(DataTransmission data) {
         log.info("收到数据下发 — 类型: {} 长度: {}", data.dataType(), data.payload().length);
     }
 }
