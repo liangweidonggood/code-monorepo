@@ -14,8 +14,8 @@ import org.springframework.stereotype.Component;
 
 /**
  * 协议帧解码器 — ByteBuf 帧 → TcpPacket
- * <p>
- * 处理完整帧（LengthFieldBasedFrameDecoder 已拆好），提取 body 后委托 Codec 解码。
+ *
+ * <p>处理完整帧（LengthFieldBasedFrameDecoder 已拆好），提取 body 后委托 Codec 解码。
  *
  * @author Administrator
  */
@@ -28,11 +28,10 @@ public class ProtocolFrameDecoder extends MessageToMessageDecoder<ByteBuf> {
     private final MessageCodecRegistry registry;
 
     @Override
-    @SuppressWarnings("unchecked")
     protected void decode(ChannelHandlerContext ctx, ByteBuf frame, java.util.List<Object> out) {
         int headerStart = frame.readerIndex();
 
-        frame.readByte(); // FE
+        frame.readByte(); // magic
         int bodyLen = frame.readUnsignedByte();
         int msgType = frame.readUnsignedByte();
         frame.readUnsignedByte(); // subMsgType
@@ -52,15 +51,14 @@ public class ProtocolFrameDecoder extends MessageToMessageDecoder<ByteBuf> {
         ByteBuf body = frame.readSlice(bodyLen);
         frame.readByte(); // skip BCC
 
-        MessageCodec<TcpPacket> codec = (MessageCodec<TcpPacket>) registry.lookup(msgType);
-        TcpPacket packet = codec.decode(body);
-        out.add(packet);
+        MessageCodec<TcpPacket> codec = registry.lookup(msgType);
+        out.add(codec.decode(body));
     }
 
     /** 暴露给单元测试 */
     public Object decode(ByteBuf frame) {
         java.util.List<Object> out = new java.util.ArrayList<>();
         decode(null, frame, out);
-        return out.isEmpty() ? null : out.get(0);
+        return out.isEmpty() ? null : out.getFirst();
     }
 }

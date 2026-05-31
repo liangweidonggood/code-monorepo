@@ -20,7 +20,7 @@ public class ServerTimeoutHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void userEventTriggered(ChannelHandlerContext ctx, Object evt) {
-        if (evt instanceof IdleStateEvent e && e.state() == IdleState.READER_IDLE) {
+        if (evt instanceof IdleStateEvent event && event.state() == IdleState.READER_IDLE) {
             if (!ctx.channel().isWritable()) {
                 return; // 背压中 setAutoRead(false) 导致的假空闲，跳过
             }

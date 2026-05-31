@@ -8,12 +8,11 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import java.util.concurrent.ThreadPoolExecutor;
 
 /**
- * 业务线程池 Bean 配置
- * <p>
- * 弹性伸缩策略：
- * <li>核心线程常驻，峰值扩容到 maxPoolSize</li>
- * <li>有界队列 + CallerRunsPolicy，队列满后调用者线程兜底执行，形成天然背压</li>
- * <li>空闲 60s 后回收多余线程</li>
+ * 业务线程池 Bean 配置。
+ *
+ *
+ * <p>弹性伸缩策略：核心线程常驻，峰值扩容到 maxPoolSize。有界队列 + CallerRunsPolicy，
+ * 队列满后调用者线程兜底执行，形成天然背压。空闲后回收多余线程。</p>
  *
  * @author Administrator
  */
@@ -21,6 +20,12 @@ import java.util.concurrent.ThreadPoolExecutor;
 @Configuration
 public class BusinessThreadPoolConfiguration {
 
+    /**
+     * 创建业务线程池 Executor Bean。
+     *
+     * @param config 线程池配置
+     * @return 配置好的 ThreadPoolTaskExecutor
+     */
     @Bean("businessExecutor")
     public ThreadPoolTaskExecutor businessExecutor(BusinessThreadPoolConfig config) {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();

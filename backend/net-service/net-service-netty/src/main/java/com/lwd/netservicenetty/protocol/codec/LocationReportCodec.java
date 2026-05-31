@@ -20,22 +20,22 @@ public class LocationReportCodec implements MessageCodec<LocationReport> {
     }
 
     @Override
-    public void encode(LocationReport p, ByteBuf out) {
-        BcdUtils.writeBcd(out, p.terminalId());
-        out.writeInt(BcdUtils.encodeLatLon(p.latitude()));
-        out.writeInt(BcdUtils.encodeLatLon(p.longitude()));
-        out.writeShort(p.speed());
-        out.writeShort(p.direction());
-        out.writeShort(p.altitude());
-        out.writeInt(p.mileage());
-        out.writeByte(p.fuelPercent());
-        out.writeByte(p.engineTemp());
-        out.writeShort(p.batteryVoltage());
-        out.writeByte(p.signalStrength());
-        out.writeByte(p.satellites());
-        out.writeInt((int) p.alarmFlags());
-        BcdUtils.writeGpsTime(out, p.gpsTime());
-        out.writeShort(p.seqNo());
+    public void encode(LocationReport pkt, ByteBuf out) {
+        BcdUtils.writeBcd(out, pkt.terminalId());
+        out.writeInt(BcdUtils.encodeLatLon(pkt.latitude()));
+        out.writeInt(BcdUtils.encodeLatLon(pkt.longitude()));
+        out.writeShort(pkt.speed());
+        out.writeShort(pkt.direction());
+        out.writeShort(pkt.altitude());
+        out.writeInt(pkt.mileage());
+        out.writeByte(pkt.fuelPercent());
+        out.writeByte(pkt.engineTemp());
+        out.writeShort(pkt.batteryVoltage());
+        out.writeByte(pkt.signalStrength());
+        out.writeByte(pkt.satellites());
+        out.writeInt((int) pkt.alarmFlags());
+        BcdUtils.writeGpsTime(out, pkt.gpsTime());
+        out.writeShort(pkt.seqNo());
     }
 
     @Override

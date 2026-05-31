@@ -9,5 +9,8 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  * @author Administrator
  */
 @ConfigurationProperties(prefix = "netty.server")
-public record NettyServerConfig(int port, LogLevel logLevel) {
+public record NettyServerConfig(
+        int port,            // 服务端 TCP 监听端口
+        LogLevel logLevel    // Netty 日志级别
+) {
 }

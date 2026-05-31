@@ -45,7 +45,7 @@ public class TcpServer {
      * 应用就绪后自动开启 TCP 服务
      */
     @EventListener(ApplicationReadyEvent.class)
-    private void start() {
+    public void start() {
         log.info("准备开启tcp服务...");
         Transport transport = Transport.resolve();
         IoHandlerFactory ioHandlerFactory = transport.factory();
@@ -53,8 +53,8 @@ public class TcpServer {
         int workerThreads = Runtime.getRuntime().availableProcessors() * 2;
         bossGroup = new MultiThreadIoEventLoopGroup(1, ioHandlerFactory);
         workerGroup = new MultiThreadIoEventLoopGroup(workerThreads, ioHandlerFactory);
-        ServerBootstrap b = new ServerBootstrap();
-        b.group(bossGroup, workerGroup)
+        ServerBootstrap bootstrap = new ServerBootstrap();
+        bootstrap.group(bossGroup, workerGroup)
                 .channel(channelClass)
                 // 已完成三次握手但未被 accept 的连接队列大小
                 .option(ChannelOption.SO_BACKLOG, 1024)
@@ -70,7 +70,7 @@ public class TcpServer {
                 .childOption(ChannelOption.WRITE_BUFFER_WATER_MARK,
                         new WriteBufferWaterMark(LOW_WATER_MARK, HIGH_WATER_MARK))
                 .childHandler(channelInitializer);
-        ChannelFuture bindFuture = b.bind(config.port()).awaitUninterruptibly();
+        ChannelFuture bindFuture = bootstrap.bind(config.port()).awaitUninterruptibly();
         if (bindFuture.isSuccess()) {
             serverChannel = bindFuture.channel();
             log.info("Netty tcp server 启动成功！");
@@ -80,6 +80,9 @@ public class TcpServer {
         }
     }
 
+    /**
+     * Spring 容器销毁时优雅关闭 Netty 资源。
+     */
     @PreDestroy
     public void shutdown() {
         log.info("收到 Spring 关闭信号，开始释放 Netty 资源...");
@@ -94,7 +97,7 @@ public class TcpServer {
             if (workerGroup != null) {
                 workerGroup.shutdownGracefully(2, 15, TimeUnit.SECONDS).syncUninterruptibly();
             }
-        } catch (RuntimeException e) {
+        } catch (IllegalStateException e) {
             // Netty shutdownGracefully 可能因线程池已关闭等原因抛出运行时异常
             log.error("Netty 释放资源期间遭遇异常", e);
         }

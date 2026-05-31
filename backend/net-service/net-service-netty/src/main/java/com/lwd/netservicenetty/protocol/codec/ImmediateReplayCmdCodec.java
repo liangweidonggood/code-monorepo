@@ -20,12 +20,12 @@ public class ImmediateReplayCmdCodec implements MessageCodec<ImmediateReplayCmd>
     }
 
     @Override
-    public void encode(ImmediateReplayCmd p, ByteBuf out) {
-        BcdUtils.writeBcd(out, p.terminalId());
-        out.writeShort(p.seqNo());
-        out.writeByte(p.flags());
-        out.writeShort(p.uploadInterval());
-        out.writeShort(p.duration());
+    public void encode(ImmediateReplayCmd pkt, ByteBuf out) {
+        BcdUtils.writeBcd(out, pkt.terminalId());
+        out.writeShort(pkt.seqNo());
+        out.writeByte(pkt.flags());
+        out.writeShort(pkt.uploadInterval());
+        out.writeShort(pkt.duration());
     }
 
     @Override

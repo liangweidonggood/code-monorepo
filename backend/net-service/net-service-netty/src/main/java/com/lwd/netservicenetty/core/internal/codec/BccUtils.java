@@ -13,15 +13,6 @@ public final class BccUtils {
         throw new UnsupportedOperationException("工具类不可实例化");
     }
 
-    /** 计算 BCC 异或校验码 */
-    public static byte compute(ByteBuf body, int bodyLen) {
-        int checksum = 0;
-        for (int i = 0; i < bodyLen; i++) {
-            checksum ^= body.getUnsignedByte(i);
-        }
-        return (byte) checksum;
-    }
-
     /** 计算帧 BCC = XOR(length, msgType, subMsgType, body) */
     public static byte computeFrame(byte length, byte msgType, byte subMsgType, ByteBuf body) {
         int checksum = (length & 0xFF) ^ (msgType & 0xFF) ^ (subMsgType & 0xFF);

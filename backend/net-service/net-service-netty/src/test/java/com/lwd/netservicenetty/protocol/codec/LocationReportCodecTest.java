@@ -8,59 +8,76 @@ import org.junit.jupiter.api.Test;
 import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.within;
 
 /**
- * LocationReportCodec 单元测试 — 核心业务消息
+ * LocationReportCodec 单元测试 — 核心业务消息。
  */
 class LocationReportCodecTest {
 
     private final LocationReportCodec codec = new LocationReportCodec();
 
     @Test
-    void shouldRoundTrip() {
-        var original = new LocationReport(
-                "12345678901234",      // terminalId (14 BCD)
-                39.907326,              // latitude
-                116.391224,             // longitude
-                80,                     // speed km/h
-                180,                    // direction
-                45,                     // altitude
-                123456,                 // mileage km
-                85,                     // fuelPercent
-                90,                     // engineTemp (90°C)
-                1250,                   // batteryVoltage 12.50V
-                28,                     // signalStrength
-                10,                     // satellites
-                0x00000001L,            // alarmFlags
-                LocalDateTime.of(2026, 5, 30, 14, 30, 0), // gpsTime
-                1                        // seqNo
-        );
-
+    void shouldEncodeCorrectFrameLength() {
+        LocationReport original = buildSampleReport();
         ByteBuf buf = Unpooled.buffer();
         codec.encode(original, buf);
-
-        // Body: 7 + 4+4 + 2+2+2+4 + 1+1+2+1+1+4 + 6 + 2 = 43 字节
         assertThat(buf.readableBytes()).isEqualTo(43);
+        buf.release();
+    }
 
+    @Test
+    void shouldRoundTrip() {
+        LocationReport original = buildSampleReport();
+        ByteBuf buf = Unpooled.buffer();
+        codec.encode(original, buf);
         LocationReport decoded = codec.decode(buf);
+        assertThat(decoded).isEqualTo(original);
+        buf.release();
+    }
 
+    @Test
+    void shouldDecodeAllFields() {
+        LocationReport original = buildSampleReport();
+        ByteBuf buf = Unpooled.buffer();
+        codec.encode(original, buf);
+        verifyDecodedFields(buf);
+        buf.release();
+    }
+
+    private void verifyDecodedFields(ByteBuf buf) {
+        LocationReport decoded = codec.decode(buf);
         assertThat(decoded.terminalId()).isEqualTo("12345678901234");
-        assertThat(decoded.latitude()).isCloseTo(39.907326, within(0.000001));
-        assertThat(decoded.longitude()).isCloseTo(116.391224, within(0.000001));
         assertThat(decoded.speed()).isEqualTo(80);
         assertThat(decoded.direction()).isEqualTo(180);
         assertThat(decoded.altitude()).isEqualTo(45);
-        assertThat(decoded.mileage()).isEqualTo(123456);
+        assertThat(decoded.mileage()).isEqualTo(123_456);
         assertThat(decoded.fuelPercent()).isEqualTo(85);
         assertThat(decoded.engineTemp()).isEqualTo(90);
-        assertThat(decoded.batteryVoltage()).isEqualTo(1250);
+        assertThat(decoded.batteryVoltage()).isEqualTo(1_250);
         assertThat(decoded.signalStrength()).isEqualTo(28);
         assertThat(decoded.satellites()).isEqualTo(10);
-        assertThat(decoded.alarmFlags()).isEqualTo(0x00000001L);
+        assertThat(decoded.alarmFlags()).isEqualTo(0x0000_0001L);
         assertThat(decoded.gpsTime()).isEqualTo(LocalDateTime.of(2026, 5, 30, 14, 30, 0));
         assertThat(decoded.seqNo()).isEqualTo(1);
+    }
 
-        buf.release();
+    private LocationReport buildSampleReport() {
+        return new LocationReport(
+                "12345678901234",
+                39.907_326,
+                116.391_224,
+                80,
+                180,
+                45,
+                123_456,
+                85,
+                90,
+                1_250,
+                28,
+                10,
+                0x0000_0001L,
+                LocalDateTime.of(2026, 5, 30, 14, 30, 0),
+                1
+        );
     }
 }

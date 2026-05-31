@@ -15,8 +15,8 @@ import org.springframework.stereotype.Component;
 
 /**
  * 协议帧编码器 — TcpPacket → ByteBuf 帧
- * <p>
- * 帧格式: [FE(1B)] [len(1B)] [msgType(1B)] [subMsgType(1B)] [body(N B)] [BCC(1B)]
+ *
+ * <p>帧格式: [FE(1B)] [len(1B)] [msgType(1B)] [subMsgType(1B)] [body(N B)] [BCC(1B)]
  *
  * @author Administrator
  */
@@ -25,12 +25,24 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class ProtocolFrameEncoder extends MessageToByteEncoder<TcpPacket> {
 
+    private static final java.util.Map<String, Integer> MSG_TYPE_MAP = java.util.Map.ofEntries(
+            java.util.Map.entry("CommonResponse", ProtocolConstants.MSG_COMMON_RESPONSE),
+            java.util.Map.entry("RegistrationRequest", ProtocolConstants.MSG_REGISTRATION_REQUEST),
+            java.util.Map.entry("AuthRequest", ProtocolConstants.MSG_AUTH_REQUEST),
+            java.util.Map.entry("Heartbeat", ProtocolConstants.MSG_HEARTBEAT),
+            java.util.Map.entry("LocationReport", ProtocolConstants.MSG_LOCATION_REPORT),
+            java.util.Map.entry("AlarmReport", ProtocolConstants.MSG_ALARM_REPORT),
+            java.util.Map.entry("DataTransmission", ProtocolConstants.MSG_DATA_TRANSMISSION),
+            java.util.Map.entry("ImmediateReplayCmd", ProtocolConstants.MSG_IMMEDIATE_REPLAY),
+            java.util.Map.entry("RegistrationResponse", ProtocolConstants.MSG_REGISTRATION_RESPONSE),
+            java.util.Map.entry("RemoteConfigCmd", ProtocolConstants.MSG_REMOTE_CONFIG)
+    );
+
     private final MessageCodecRegistry registry;
 
     @Override
-    @SuppressWarnings("unchecked")
     protected void encode(ChannelHandlerContext ctx, TcpPacket packet, ByteBuf out) {
-        MessageCodec<TcpPacket> codec = (MessageCodec<TcpPacket>) registry.lookup(msgTypeOf(packet));
+        MessageCodec<TcpPacket> codec = registry.lookup(msgTypeOf(packet));
         int msgType = codec.msgType();
         byte subMsgType = ProtocolConstants.SUB_TYPE_PLAIN;
 
@@ -61,36 +73,11 @@ public class ProtocolFrameEncoder extends MessageToByteEncoder<TcpPacket> {
     }
 
     private int msgTypeOf(TcpPacket packet) {
-        if (packet instanceof com.lwd.netservicenetty.protocol.CommonResponse) {
-            return ProtocolConstants.MSG_COMMON_RESPONSE;
+        Integer type = MSG_TYPE_MAP.get(packet.getClass().getSimpleName());
+        if (type == null) {
+            throw new IllegalArgumentException(
+                    "未知消息类型: " + packet.getClass().getSimpleName());
         }
-        if (packet instanceof com.lwd.netservicenetty.protocol.RegistrationRequest) {
-            return ProtocolConstants.MSG_REGISTRATION_REQUEST;
-        }
-        if (packet instanceof com.lwd.netservicenetty.protocol.AuthRequest) {
-            return ProtocolConstants.MSG_AUTH_REQUEST;
-        }
-        if (packet instanceof com.lwd.netservicenetty.protocol.Heartbeat) {
-            return ProtocolConstants.MSG_HEARTBEAT;
-        }
-        if (packet instanceof com.lwd.netservicenetty.protocol.LocationReport) {
-            return ProtocolConstants.MSG_LOCATION_REPORT;
-        }
-        if (packet instanceof com.lwd.netservicenetty.protocol.AlarmReport) {
-            return ProtocolConstants.MSG_ALARM_REPORT;
-        }
-        if (packet instanceof com.lwd.netservicenetty.protocol.DataTransmission) {
-            return ProtocolConstants.MSG_DATA_TRANSMISSION;
-        }
-        if (packet instanceof com.lwd.netservicenetty.protocol.ImmediateReplayCmd) {
-            return ProtocolConstants.MSG_IMMEDIATE_REPLAY;
-        }
-        if (packet instanceof com.lwd.netservicenetty.protocol.RegistrationResponse) {
-            return ProtocolConstants.MSG_REGISTRATION_RESPONSE;
-        }
-        if (packet instanceof com.lwd.netservicenetty.protocol.RemoteConfigCmd) {
-            return ProtocolConstants.MSG_REMOTE_CONFIG;
-        }
-        throw new IllegalArgumentException("未知消息类型: " + packet.getClass().getSimpleName());
+        return type;
     }
 }

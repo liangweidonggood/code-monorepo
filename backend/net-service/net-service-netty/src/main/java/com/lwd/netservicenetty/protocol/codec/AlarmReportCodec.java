@@ -22,15 +22,15 @@ public class AlarmReportCodec implements MessageCodec<AlarmReport> {
     }
 
     @Override
-    public void encode(AlarmReport p, ByteBuf out) {
-        BcdUtils.writeBcd(out, p.terminalId());
-        out.writeShort(p.alarmType());
-        out.writeByte(p.alarmLevel());
-        out.writeInt(BcdUtils.encodeLatLon(p.latitude()));
-        out.writeInt(BcdUtils.encodeLatLon(p.longitude()));
-        out.writeShort(p.speed());
-        BcdUtils.writeGpsTime(out, p.alarmTime());
-        byte[] descBytes = p.description().getBytes(StandardCharsets.US_ASCII);
+    public void encode(AlarmReport pkt, ByteBuf out) {
+        BcdUtils.writeBcd(out, pkt.terminalId());
+        out.writeShort(pkt.alarmType());
+        out.writeByte(pkt.alarmLevel());
+        out.writeInt(BcdUtils.encodeLatLon(pkt.latitude()));
+        out.writeInt(BcdUtils.encodeLatLon(pkt.longitude()));
+        out.writeShort(pkt.speed());
+        BcdUtils.writeGpsTime(out, pkt.alarmTime());
+        byte[] descBytes = pkt.description().getBytes(StandardCharsets.US_ASCII);
         out.writeByte(descBytes.length);
         out.writeBytes(descBytes);
     }

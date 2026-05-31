@@ -1,0 +1,114 @@
+<?xml version="1.0"?>
+<ruleset name="Custom Rules"
+         xmlns="http://pmd.sourceforge.net/ruleset/2.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://pmd.sourceforge.net/ruleset/2.0.0 https://pmd.sourceforge.io/ruleset_2_0_0.xsd">
+
+    <description>
+        Custom PMD Rules
+        https://docs.pmd-code.org/latest
+    </description>
+    <!-- 1 最佳实践 -->
+    <rule ref="category/java/bestpractices.xml">
+        <exclude name="ImplicitFunctionalInterface"/>
+        <exclude name="GuardLogStatement"/>
+    </rule>
+    <!-- 2 代码风格 -->
+    <rule ref="category/java/codestyle.xml">
+        <exclude name="LocalVariableCouldBeFinal"/>
+        <exclude name="MethodArgumentCouldBeFinal"/>
+        <exclude name="AtLeastOneConstructor"/>
+        <exclude name="LinguisticNaming"/>
+        <exclude name="UseShortArrayInitializer"/>
+        <exclude name="OnlyOneReturn"/>
+    </rule>
+    <rule ref="category/java/codestyle.xml/ShortClassName">
+        <properties>
+            <property name="minimum" value="1"/>
+        </properties>
+    </rule>
+    <rule ref="category/java/codestyle.xml/LongVariable">
+        <properties>
+            <property name="minimum" value="30"/>
+        </properties>
+    </rule>
+    <rule ref="category/java/codestyle.xml/ShortVariable">
+        <properties>
+            <property name="minimum" value="2"/>
+        </properties>
+    </rule>
+    <rule ref="category/java/codestyle.xml/ShortMethodName">
+        <properties>
+            <property name="minimum" value="2"/>
+        </properties>
+    </rule>
+    <!-- 3 设计 -->
+    <rule ref="category/java/design.xml">
+        <exclude name="UseUtilityClass"/>
+        <exclude name="UselessOverridingMethod"/>
+        <exclude name="DataClass"/>
+        <exclude name="LoosePackageCoupling"/>
+        <exclude name="SignatureDeclareThrowsException"/>
+    </rule>
+    <rule ref="category/java/design.xml/TooManyMethods">
+        <properties>
+            <property name="maxmethods" value="30"/>
+        </properties>
+    </rule>
+    <rule ref="category/java/design.xml/LawOfDemeter">
+        <properties>
+            <property name="trustRadius" value="2"/>
+        </properties>
+    </rule>
+    <!-- 4 文档 -->
+    <rule ref="category/java/documentation.xml">
+        <exclude name="CommentRequired"/>
+    </rule>
+    <rule ref="category/java/documentation.xml/CommentRequired">
+        <properties>
+            <property name="methodWithOverrideCommentRequirement" value="ignored"/>
+            <property name="accessorCommentRequirement" value="ignored"/>
+            <property name="classCommentRequirement" value="required"/>
+            <property name="fieldCommentRequirement" value="ignored"/>
+            <property name="publicMethodCommentRequirement" value="ignored"/>
+            <property name="protectedMethodCommentRequirement" value="required"/>
+            <property name="enumCommentRequirement" value="required"/>
+            <property name="serialVersionUIDCommentRequired" value="ignored"/>
+            <property name="serialPersistentFieldsCommentRequired" value="ignored"/>
+        </properties>
+    </rule>
+    <rule ref="category/java/documentation.xml/CommentSize">
+        <properties>
+            <property name="maxLines" value="30"/>
+            <property name="maxLineLength" value="120"/>
+        </properties>
+    </rule>
+    <!-- 5 错误易发性 -->
+    <rule ref="category/java/errorprone.xml">
+    </rule>
+    <rule ref="category/java/errorprone.xml/AvoidDuplicateLiterals">
+        <properties>
+            <property name="maxDuplicateLiterals" value="10"/>
+            <property name="minimumLength" value="3"/>
+            <property name="skipAnnotations" value="false"/>
+            <property name="exceptionList" value=""/>
+        </properties>
+    </rule>
+    <rule ref="category/java/errorprone.xml/AvoidCatchingGenericException">
+        <properties>
+            <property name="typesThatShouldNotBeCaught"
+                      value="java.lang.RuntimeException,java.lang.Throwable,java.lang.Error"/>
+        </properties>
+    </rule>
+    <!-- 6 多线程 -->
+    <rule ref="category/java/multithreading.xml">
+        <exclude name="DoNotUseThreads"/>
+    </rule>
+    <!-- 7 性能优化-->
+    <rule ref="category/java/performance.xml">
+    </rule>
+    <!-- 8 安全 -->
+    <rule ref="category/java/security.xml">
+    </rule>
+
+</ruleset>

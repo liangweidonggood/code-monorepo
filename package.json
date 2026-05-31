@@ -12,7 +12,9 @@
     "stylelint:check": "stylelint \"**/*.{css,scss,less}\"",
     "stylelint": "stylelint \"**/*.{css,scss,less}\" --fix",
     "lint": "eslint . && stylelint \"**/*.{css,scss,less}\" && prettier --check .",
-    "lint:fix": "eslint . --fix && stylelint \"**/*.{css,scss,less}\" --fix && prettier --write ."
+    "lint:fix": "eslint . --fix && stylelint \"**/*.{css,scss,less}\" --fix && prettier --write .",
+    "net-service-netty:check": "cd backend/net-service/net-service-netty && gradlew compileJava pmdMain checkstyleMain",
+    "net-service-netty-client:check": "cd backend/net-service/net-service-netty-client && gradlew compileJava pmdMain checkstyleMain"
   },
   "keywords": [
     "monorepo"
@@ -51,6 +53,10 @@
     "**/*.{css,scss,less}": [
       "pnpm stylelint:check",
       "pnpm format:check"
+    ],
+    "**/*.java": [
+      "pnpm net-service-netty:check",
+      "pnpm net-service-netty-client:check"
     ]
   }
 }

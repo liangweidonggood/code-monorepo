@@ -7,14 +7,14 @@ import io.netty.buffer.ByteBuf;
  *
  * @author Administrator
  */
-final class BcdUtils {
+public final class BcdUtils {
 
     private BcdUtils() {
         throw new UnsupportedOperationException("工具类不可实例化");
     }
 
     /** 将 ByteBuf 中的 BCD 字节解码为数字字符串 */
-    static String readBcd(ByteBuf in, int length) {
+    public static String readBcd(ByteBuf in, int length) {
         byte[] bytes = new byte[length];
         in.readBytes(bytes);
         StringBuilder sb = new StringBuilder(length * 2);
@@ -25,7 +25,7 @@ final class BcdUtils {
     }
 
     /** 将数字字符串编码为 BCD 写入 ByteBuf */
-    static void writeBcd(ByteBuf out, String digits) {
+    public static void writeBcd(ByteBuf out, String digits) {
         if (digits.length() % 2 != 0) {
             throw new IllegalArgumentException("BCD 编码要求偶数位数字，实际: " + digits.length());
         }
@@ -37,17 +37,17 @@ final class BcdUtils {
     }
 
     /** 编码经纬度：double 值 × 1,000,000 → int */
-    static int encodeLatLon(double value) {
+    public static int encodeLatLon(double value) {
         return (int) Math.round(value * 1_000_000);
     }
 
     /** 解码经纬度：int ÷ 1,000,000 → double */
-    static double decodeLatLon(int raw) {
+    public static double decodeLatLon(int raw) {
         return raw / 1_000_000.0;
     }
 
     /** 编码 GPS 时间为 6 字节 BCD: YYMMDDHHmmss */
-    static void writeGpsTime(ByteBuf out, java.time.LocalDateTime time) {
+    public static void writeGpsTime(ByteBuf out, java.time.LocalDateTime time) {
         writeBcd(out, String.format("%02d%02d%02d%02d%02d%02d",
                 time.getYear() % 100,
                 time.getMonthValue(),
@@ -58,7 +58,7 @@ final class BcdUtils {
     }
 
     /** 解码 6 字节 BCD 为 LocalDateTime */
-    static java.time.LocalDateTime readGpsTime(ByteBuf in) {
+    public static java.time.LocalDateTime readGpsTime(ByteBuf in) {
         String raw = readBcd(in, 6);
         return java.time.LocalDateTime.of(
                 2000 + Integer.parseInt(raw.substring(0, 2)),

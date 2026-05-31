@@ -1,8 +1,27 @@
 plugins {
     java
+    checkstyle
+    pmd
     id("org.springframework.boot") version "4.0.6"
     id("io.spring.dependency-management") version "1.1.7"
     id("org.sonarqube") version "7.3.0.8198"
+}
+
+checkstyle {
+    toolVersion = "13.4.2"
+    isIgnoreFailures = false
+    isShowViolations = true
+    maxWarnings = 0
+    maxErrors = 0
+    configFile = rootProject.file("../../../global/config/checkstyle/checkstyle.xml")
+}
+
+pmd {
+    toolVersion = "7.21.0"
+    isConsoleOutput = true
+    isIgnoreFailures = false
+    ruleSets = listOf()
+    ruleSetFiles = rootProject.files("../../../global/config/pmd/ruleset.xml")
 }
 
 sonar {

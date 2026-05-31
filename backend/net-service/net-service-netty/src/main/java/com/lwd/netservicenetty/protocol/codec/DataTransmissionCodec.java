@@ -20,11 +20,11 @@ public class DataTransmissionCodec implements MessageCodec<DataTransmission> {
     }
 
     @Override
-    public void encode(DataTransmission p, ByteBuf out) {
-        BcdUtils.writeBcd(out, p.terminalId());
-        out.writeShort(p.dataType());
-        out.writeShort(p.payload().length);
-        out.writeBytes(p.payload());
+    public void encode(DataTransmission pkt, ByteBuf out) {
+        BcdUtils.writeBcd(out, pkt.terminalId());
+        out.writeShort(pkt.dataType());
+        out.writeShort(pkt.payload().length);
+        out.writeBytes(pkt.payload());
     }
 
     @Override

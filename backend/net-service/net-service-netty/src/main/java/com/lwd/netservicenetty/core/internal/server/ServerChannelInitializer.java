@@ -20,17 +20,7 @@ import org.springframework.stereotype.Component;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Pipeline 装配工厂
- * <p>
- * 入站方向:
- *   流量整形(限速 2MB/s) → 日志 → 背压保护 → 空闲检测(60s) → 超时断开
- *   → 魔数校验(0xFE) → 长度拆包 → 协议解码(ByteBuf→TcpPacket) → 业务处理
- * <p>
- * 出站方向:
- *   协议编码(TcpPacket→ByteBuf) → 网络
- * <p>
- * 协议帧格式: [FE:1B] [len:1B] [type:1B] [sub:1B] [body:N B] [BCC:1B]
- * length 字段仅代表 body 的字节数，不含帧头帧尾。
+ * Pipeline 装配工厂 — 入站: 流量整形→日志→背压→空闲→拆包→解码→业务。出站: 编码→网络。
  *
  * @author Administrator
  */

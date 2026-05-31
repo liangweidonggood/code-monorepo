@@ -1,7 +1,5 @@
 package com.lwd.netservicenetty.core.internal.codec;
 
-import com.lwd.netservicenetty.protocol.TcpPacket;
-
 import com.lwd.netservicenetty.protocol.MessageCodec;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -36,7 +34,13 @@ public class MessageCodecRegistry {
                         .sorted().collect(Collectors.joining(", ")));
     }
 
-    @SuppressWarnings("unchecked")
+    /**
+     * 根据消息类型码查找对应的编解码器。
+     *
+     * @param msgType 消息类型码
+     * @param <T>    消息类型
+     * @return 编解码器实例
+     */
     public <T extends com.lwd.netservicenetty.protocol.TcpPacket> MessageCodec<T> lookup(int msgType) {
         MessageCodec<?> codec = codecMap.get(msgType);
         if (codec == null) {

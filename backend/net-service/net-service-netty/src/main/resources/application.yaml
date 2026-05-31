@@ -14,14 +14,3 @@ netty:
       queue-capacity: 200
       keep-alive-seconds: 60
       thread-name-prefix: biz-worker-
-  client:
-    enabled: true
-    host: localhost
-    port: 8889
-    heartbeat-interval-seconds: 20
-    location-interval-seconds: 5
-    reconnect-base-delay-seconds: 1
-    reconnect-max-delay-seconds: 120
-    terminal-id: "12345678901234"
-    manufacturer-id: 1
-    license-plate: "京A12345"

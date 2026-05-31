@@ -22,18 +22,18 @@ public class RegistrationRequestCodec implements MessageCodec<RegistrationReques
     }
 
     @Override
-    public void encode(RegistrationRequest p, ByteBuf out) {
-        BcdUtils.writeBcd(out, p.terminalId());
-        out.writeShort(p.manufacturerId());
-        BcdUtils.writeBcd(out, p.terminalModel());
-        out.writeByte(p.hardwareVersion());
-        out.writeByte(p.softwareVersion());
-        out.writeShort(p.provinceId());
-        out.writeShort(p.cityId());
-        byte[] plateBytes = p.licensePlate().getBytes(StandardCharsets.US_ASCII);
+    public void encode(RegistrationRequest pkt, ByteBuf out) {
+        BcdUtils.writeBcd(out, pkt.terminalId());
+        out.writeShort(pkt.manufacturerId());
+        BcdUtils.writeBcd(out, pkt.terminalModel());
+        out.writeByte(pkt.hardwareVersion());
+        out.writeByte(pkt.softwareVersion());
+        out.writeShort(pkt.provinceId());
+        out.writeShort(pkt.cityId());
+        byte[] plateBytes = pkt.licensePlate().getBytes(StandardCharsets.US_ASCII);
         out.writeByte(plateBytes.length);
         out.writeBytes(plateBytes);
-        out.writeByte(p.color());
+        out.writeByte(pkt.color());
     }
 
     @Override

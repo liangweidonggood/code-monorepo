@@ -22,11 +22,11 @@ public class RegistrationResponseCodec implements MessageCodec<RegistrationRespo
     }
 
     @Override
-    public void encode(RegistrationResponse p, ByteBuf out) {
-        out.writeShort(p.seqNo());
-        out.writeByte(p.result());
-        BcdUtils.writeBcd(out, p.authCode());
-        byte[] msgBytes = p.message().getBytes(StandardCharsets.US_ASCII);
+    public void encode(RegistrationResponse pkt, ByteBuf out) {
+        out.writeShort(pkt.seqNo());
+        out.writeByte(pkt.result());
+        BcdUtils.writeBcd(out, pkt.authCode());
+        byte[] msgBytes = pkt.message().getBytes(StandardCharsets.US_ASCII);
         out.writeByte(msgBytes.length);
         out.writeBytes(msgBytes);
     }

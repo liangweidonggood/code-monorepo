@@ -7,8 +7,8 @@ import org.jspecify.annotations.NonNull;
 
 /**
  * 远程配置指令 — 服务端下发参数修改
- * <p>
- * Body: [终端号(14B BCD)] + [流水号(2B)] + [参数ID(1B)] + [参数长度(1B)] + [参数值(N B)]
+ *
+ * <p>Body: [终端号(14B BCD)] + [流水号(2B)] + [参数ID(1B)] + [参数长度(1B)] + [参数值(N B)]
  *
  * @author Administrator
  */
@@ -20,13 +20,13 @@ public record RemoteConfigCmd(
 ) implements TcpPacket {
 
     @Override
-    public boolean equals(Object o) {
-        return this == o || (o instanceof RemoteConfigCmd(
-                String tid, int sn, int pid, byte[] pv)
-                && seqNo == sn
-                && paramId == pid
-                && terminalId.equals(tid)
-                && Arrays.equals(paramValue, pv));
+    public boolean equals(Object obj) {
+        return this == obj || (obj instanceof RemoteConfigCmd(
+                String tid, int ser, int pid, byte[] pval) &&
+                seqNo == ser &&
+                paramId == pid &&
+                terminalId.equals(tid) &&
+                Arrays.equals(paramValue, pval));
     }
 
     @Override
@@ -41,9 +41,9 @@ public record RemoteConfigCmd(
     @Override
     @NonNull
     public String toString() {
-        return "RemoteConfigCmd[terminalId=" + terminalId
-                + ", seqNo=" + seqNo
-                + ", paramId=" + paramId
-                + ", paramValue=" + Arrays.toString(paramValue) + "]";
+        return "RemoteConfigCmd[terminalId=" + terminalId +
+                ", seqNo=" + seqNo +
+                ", paramId=" + paramId +
+                ", paramValue=" + Arrays.toString(paramValue) + "]";
     }
 }

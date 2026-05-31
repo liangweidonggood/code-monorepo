@@ -2,11 +2,7 @@ package com.lwd.netservicenetty.protocol;
 
 
 /**
- * 注册请求
- * <p>
- * Body: [终端号(7B BCD)] + [厂商编号(2B)] + [设备型号(2B BCD)] + [硬件版本(1B)]
- * + [软件版本(1B)] + [省域ID(2B)] + [市县域ID(2B)] + [车牌长度(1B)] + [车牌号(N B ASCII)]
- * + [车牌颜色(1B)] = 19 + plateLen 字节
+ * 注册请求 — 终端信息 + 车牌号等字段。
  *
  * @author Administrator
  */
