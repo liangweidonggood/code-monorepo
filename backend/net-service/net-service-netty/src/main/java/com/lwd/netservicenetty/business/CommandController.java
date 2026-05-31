@@ -31,6 +31,8 @@ public class CommandController {
     private static final int CMD_SEQ_IMMEDIATE_REPLAY = 200;
     /** 远程配置指令流水号起始值 */
     private static final int CMD_SEQ_REMOTE_CONFIG = 201;
+    /** 响应 JSON 键常量 */
+    private static final String KEY_SUCCESS = "success";
 
     private final DeviceRegistry registry;
 
@@ -49,7 +51,7 @@ public class CommandController {
             @RequestParam(defaultValue = "30") int durationSeconds) {
         ChannelHandlerContext ctx = registry.lookup(terminalId);
         if (ctx == null || !ctx.channel().isActive()) {
-            return Map.of("success", false, "message", "终端不在线: " + terminalId);
+            return Map.of(KEY_SUCCESS, false, "message", "终端不在线: " + terminalId);
         }
         ImmediateReplayCmd cmd = new ImmediateReplayCmd(terminalId, CMD_SEQ_IMMEDIATE_REPLAY, (byte) 0,
                 intervalSeconds, durationSeconds);
@@ -59,7 +61,7 @@ public class CommandController {
             }
         });
         log.info("【Web下发】立即回传 → 终端: {} 间隔: {}s 持续: {}s", terminalId, intervalSeconds, durationSeconds);
-        return Map.of("success", true, "terminalId", terminalId,
+        return Map.of(KEY_SUCCESS, true, "terminalId", terminalId,
                 "command", "immediate-replay",
                 "interval", intervalSeconds, "duration", durationSeconds);
     }
@@ -72,7 +74,7 @@ public class CommandController {
             @RequestParam String paramValue) {
         ChannelHandlerContext ctx = registry.lookup(terminalId);
         if (ctx == null || !ctx.channel().isActive()) {
-            return Map.of("success", false, "message", "终端不在线: " + terminalId);
+            return Map.of(KEY_SUCCESS, false, "message", "终端不在线: " + terminalId);
         }
         RemoteConfigCmd cmd = new RemoteConfigCmd(terminalId, CMD_SEQ_REMOTE_CONFIG, paramId,
                 paramValue.getBytes(StandardCharsets.US_ASCII));
@@ -82,7 +84,7 @@ public class CommandController {
             }
         });
         log.info("【Web下发】远程配置 → 终端: {} 参数ID: {} 值: {}", terminalId, paramId, paramValue);
-        return Map.of("success", true, "terminalId", terminalId,
+        return Map.of(KEY_SUCCESS, true, "terminalId", terminalId,
                 "command", "remote-config", "paramId", paramId, "paramValue", paramValue);
     }
 }

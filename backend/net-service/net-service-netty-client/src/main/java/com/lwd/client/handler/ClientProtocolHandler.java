@@ -72,6 +72,7 @@ public class ClientProtocolHandler extends SimpleChannelInboundHandler<ByteBuf> 
           case MSG_REGISTRATION_RESPONSE -> handleReg(ctx, decoded.body());
           case MSG_COMMON_RESPONSE_SERVER, MSG_COMMON_RESPONSE -> handleCommonResp(ctx, decoded.body());
           case MSG_IMMEDIATE_REPLAY -> handleReplay(ctx, decoded.body());
+          case MSG_REMOTE_CONFIG -> handleRemoteConfig(ctx, decoded.body());
           default -> {
               if (LOG.isDebugEnabled()) {
                   LOG.debug("未处理: 0x{}", Integer.toHexString(decoded.msgType()));
@@ -132,6 +133,15 @@ public class ClientProtocolHandler extends SimpleChannelInboundHandler<ByteBuf> 
                 cmd.seqNo(), cmd.uploadInterval(), cmd.duration());
         locationHandler.adjustInterval(cmd.uploadInterval(), cmd.duration());
         CommonResponse resp = new CommonResponse(cmd.seqNo(), (short) MSG_IMMEDIATE_REPLAY, 0);
+        writeFrame(ctx, MSG_COMMON_RESPONSE, encodeCommonResponse(resp));
+    }
+
+    /** 处理远程配置指令：打印参数 + 回复通用应答 */
+    private void handleRemoteConfig(ChannelHandlerContext ctx, ByteBuf body) {
+        RemoteConfig cmd = decodeRemoteConfig(body);
+        String value = new String(cmd.paramValue(), java.nio.charset.StandardCharsets.UTF_8);
+        LOG.info("收到远程配置指令 — 流水号: {} 参数ID: {} 值: {}", cmd.seqNo(), cmd.paramId(), value);
+        CommonResponse resp = new CommonResponse(cmd.seqNo(), (short) MSG_REMOTE_CONFIG, 0);
         writeFrame(ctx, MSG_COMMON_RESPONSE, encodeCommonResponse(resp));
     }
 

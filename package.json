@@ -44,19 +44,5 @@
     "stylelint-less": "^4.2.1",
     "stylelint-scss": "^7.1.1",
     "typescript-eslint": "^8.60.0"
-  },
-  "lint-staged": {
-    "**/*.{js,jsx,ts,tsx,vue}": [
-      "pnpm eslint:check",
-      "pnpm format:check"
-    ],
-    "**/*.{css,scss,less}": [
-      "pnpm stylelint:check",
-      "pnpm format:check"
-    ],
-    "**/*.java": [
-      "pnpm net-service-netty:check",
-      "pnpm net-service-netty-client:check"
-    ]
   }
 }

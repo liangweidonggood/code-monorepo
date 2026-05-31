@@ -37,6 +37,8 @@ public final class ProtocolConstants {
     public static final int MSG_REGISTRATION_RESPONSE = 0x81;
     /** 立即回传指令（服务端→终端） */
     public static final int MSG_IMMEDIATE_REPLAY = 0x82;
+    /** 远程配置指令（服务端→终端） */
+    public static final int MSG_REMOTE_CONFIG = 0x83;
 
     private ProtocolConstants() {
         throw new UnsupportedOperationException("常量类不可实例化");

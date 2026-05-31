@@ -310,4 +310,20 @@ public final class FrameCodec {
         int duration = in.readUnsignedShort();
         return new ImmediateReplay(seqNo, flags, uploadInterval, duration);
     }
+
+    /**
+     * 解码远程配置指令 Body: [终端号(7B BCD)] [流水号(2B)] [参数ID(1B)] [值长度(1B)] [参数值(NB)]
+     *
+     * @param in 源 ByteBuf
+     * @return 远程配置指令
+     */
+    public static RemoteConfig decodeRemoteConfig(ByteBuf in) {
+        in.skipBytes(7); // 跳过终端号 7 字节 BCD
+        int seqNo = in.readUnsignedShort();
+        int paramId = in.readUnsignedByte();
+        int valueLen = in.readUnsignedByte();
+        byte[] paramValue = new byte[valueLen];
+        in.readBytes(paramValue);
+        return new RemoteConfig(seqNo, paramId, paramValue);
+    }
 }
